@@ -178,7 +178,7 @@ export class CourseManagementComponent implements OnInit, AfterViewInit {
       }
     }
     
-    this.http.get<any[]>('https://lms-backend001-110ad185d2b7.herokuapp.com', { headers })
+    this.http.get<any[]>('https://lms-backend001-110ad185d2b7.herokuapp.com/api/users/list?role=instructor', { headers })
       .subscribe({
         next: (data) => {
           this.instructors = data;

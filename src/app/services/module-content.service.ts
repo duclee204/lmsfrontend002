@@ -84,7 +84,7 @@ export interface ContentProgress {
   providedIn: 'root'
 })
 export class ModuleContentService {
-  private apiUrl = 'https://lms-backend001-110ad185d2b7.herokuapp.com/';
+  private apiUrl = 'https://lms-backend001-110ad185d2b7.herokuapp.com';
 
   constructor(private http: HttpClient) {}
 

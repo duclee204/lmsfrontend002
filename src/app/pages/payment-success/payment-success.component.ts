@@ -175,14 +175,14 @@ export class PaymentSuccessComponent implements OnInit {
       // Thanh toán thành công
       this.isSuccess = true;
       this.message = 'Bạn đã thanh toán thành công và được đăng ký vào khóa học!';
-      
-      // Gọi API để confirm payment
-      this.confirmPayment(transactionId);
     } else {
       // Thanh toán thất bại
       this.isSuccess = false;
       this.message = 'Giao dịch không thành công. Vui lòng thử lại sau.';
     }
+    
+    // 🔧 FIX: Gọi API confirm cho cả success và failed
+    this.confirmPayment(transactionId);
   }
 
   private confirmPayment(transactionId: string) {

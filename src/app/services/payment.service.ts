@@ -181,7 +181,7 @@ export class PaymentService {
    * Xác nhận thanh toán VNPay (gọi callback)
    */
   confirmVNPayPayment(queryParams: string): Observable<PaymentResponse> {
-    return this.http.get<PaymentResponse>(`${this.apiUrl}/vnpay-callback${queryParams}`);
+    return this.http.get<PaymentResponse>(`${this.apiUrl}/vnpay-payment-callback${queryParams}`);
   }
 
   /**

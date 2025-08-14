@@ -214,7 +214,7 @@ export class CategoryComponent implements OnInit {
       });
     } else {
       // POST: tạo mới danh mục
-      this.http.post('hhttps://lms-backend001-110ad185d2b7.herokuapp.com/api/categories', this.newCategory, {
+      this.http.post('https://lms-backend001-110ad185d2b7.herokuapp.com/api/categories', this.newCategory, {
         responseType: 'text'
       }).subscribe({
         next: (res) => {

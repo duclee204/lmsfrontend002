@@ -17,6 +17,7 @@ import { isPlatformBrowser } from '@angular/common';
 export class LoginComponent {
   loginForm: FormGroup;
   loginError: string | null = null;
+  showPassword: boolean = false;
 
   constructor(
     private fb: FormBuilder, 
@@ -52,5 +53,9 @@ export class LoginComponent {
         }
       });
     }
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
   }
 }

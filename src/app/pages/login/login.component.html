@@ -9,10 +9,60 @@
     <h2 class="login-title">Đăng nhập</h2>
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <div class="form-group">
-        <input id="username" formControlName="username" type="text" placeholder="Username" />
+        <label for="username">Username</label>
+        <input id="username" formControlName="username" type="text" placeholder="Username" autocomplete="username" />
       </div>
       <div class="form-group">
-        <input id="password" formControlName="password" type="password" placeholder="Password" />
+        <label for="password">Password</label>
+        <div class="password-input-wrapper">
+          <input 
+            id="password" 
+            formControlName="password" 
+            [type]="showPassword ? 'text' : 'password'" 
+            placeholder="Password" 
+            autocomplete="current-password" 
+          />
+          <button 
+            type="button" 
+            class="password-toggle-btn"
+            (click)="togglePasswordVisibility()"
+            [attr.aria-label]="showPassword ? 'Ẩn mật khẩu' : 'Hiển thị mật khẩu'"
+          >
+            <svg 
+              width="20" 
+              height="20" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              @if (!showPassword) {
+                <path 
+                  d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" 
+                  stroke="currentColor" 
+                  stroke-width="2" 
+                  fill="none"
+                />
+                <circle 
+                  cx="12" 
+                  cy="12" 
+                  r="3" 
+                  stroke="currentColor" 
+                  stroke-width="2" 
+                  fill="none"
+                />
+              } @else {
+                <path 
+                  d="m1 1 22 22M9.88 9.88a3 3 0 1 0 4.24 4.24M6.61 6.61A13.526 13.526 0 0 0 1 12s4 8 11 8c1.76 0 3.4-.34 4.88-.97M19.13 19.13A13.526 13.526 0 0 0 23 12s-4-8-11-8c-1.47 0-2.86.26-4.13.72" 
+                  stroke="currentColor" 
+                  stroke-width="2" 
+                  fill="none" 
+                  stroke-linecap="round" 
+                  stroke-linejoin="round"
+                />
+              }
+            </svg>
+          </button>
+        </div>
       </div>
       <button type="submit" class="login-btn">Login</button>
     </form>

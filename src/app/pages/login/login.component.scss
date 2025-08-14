@@ -76,11 +76,68 @@
   height: 54px;
   flex-shrink: 0;
   border-radius: 10px;
-  border: 1px solid #000;
+  border: 2px solid #ddd;
   background: #FFFAFA;
   margin-bottom: 1.1rem;
   display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    border-color: #999;
+  }
+
+  &:focus-within {
+    border-color: #018ED5;
+    box-shadow: 0 0 0 3px rgba(1, 142, 213, 0.1);
+  }
+
+  label {
+    display: none;
+  }
+}
+
+.password-input-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
   align-items: center;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.3s ease, background-color 0.3s ease;
+  z-index: 2;
+
+  &:hover {
+    color: #018ED5;
+    background-color: rgba(1, 142, 213, 0.1);
+  }
+
+  &:focus {
+    outline: none;
+    color: #018ED5;
+    background-color: rgba(1, 142, 213, 0.1);
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
 }
 
 input[type="text"],
@@ -91,7 +148,46 @@ input[type="password"] {
   background: transparent;
   font-size: 1.1rem;
   padding: 0 1rem;
+  padding-right: 3rem; /* Add space for the toggle button */
   outline: none;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+
+  &:-webkit-autofill,
+  &:-webkit-autofill:hover,
+  &:-webkit-autofill:focus,
+  &:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px #FFFAFA inset !important;
+    -webkit-text-fill-color: #333 !important;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  /* Firefox autocomplete styling */
+  &:-moz-autofill {
+    background-color: #FFFAFA !important;
+    color: #333 !important;
+  }
+
+  /* Edge and other browsers */
+  &:autofill {
+    background-color: #FFFAFA !important;
+    color: #333 !important;
+    border: none !important;
+  }
+
+  &::placeholder {
+    color: #999;
+    opacity: 1;
+  }
+
+  &:focus::placeholder {
+    color: #bbb;
+  }
+}
+
+/* Username input doesn't need extra padding */
+input[type="text"] {
+  padding-right: 1rem;
 }
 
 .login-btn {
@@ -101,16 +197,33 @@ input[type="password"] {
   border-radius: 10px;
   background: #018ED5;
   color: #fff;
-  border: none;
+  border: 2px solid #018ED5;
   font-size: 1.2rem;
   font-weight: 700;
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
   cursor: pointer;
-  transition: background 0.2s;
-}
-.login-btn:hover {
-  background: #0073b1;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: #0073b1;
+    border-color: #0073b1;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(1, 142, 213, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(1, 142, 213, 0.3);
+  }
+
+  &:disabled {
+    background: #ccc;
+    border-color: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
 }
 
 .register-btn {
@@ -120,16 +233,42 @@ input[type="password"] {
   border-radius: 10px;
   background: #4BB31A;
   color: #fff;
-  border: none;
+  border: 2px solid #4BB31A;
   font-size: 1.2rem;
   font-weight: 700;
   margin: 1.2rem auto 0 auto;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.3s ease;
   display: block;
+
+  &:hover {
+    background: #249900;
+    border-color: #249900;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(75, 179, 26, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(75, 179, 26, 0.3);
+  }
 }
-.register-btn:hover {
-  background: #249900;
+
+.login-links {
+  margin: 0.5rem 0;
+  text-align: center;
+}
+
+.forgot-link {
+  color: #666;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: #018ED5;
+    text-decoration: underline;
+  }
 }
 
 @media (max-width: 700px) {
@@ -151,6 +290,15 @@ input[type="password"] {
     font-size: 1.3rem;
     width: auto;
     height: auto;
+  }
+  
+  .password-toggle-btn {
+    right: 8px;
+    
+    svg {
+      width: 18px;
+      height: 18px;
+    }
   }
 }
 

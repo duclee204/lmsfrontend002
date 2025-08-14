@@ -84,7 +84,7 @@ export interface ContentProgress {
   providedIn: 'root'
 })
 export class ModuleContentService {
-  private apiUrl = 'https://lms-backend001-110ad185d2b7.herokuapp.com';
+  private apiUrl = 'https://lms-backend001-110ad185d2b7.herokuapp.com/api';
 
   constructor(private http: HttpClient) {}
 
@@ -121,7 +121,7 @@ export class ModuleContentService {
   }
 
   updateVideoProgress(videoId: number, completed: boolean): Observable<any> {
-    return this.http.post(`${this.apiUrl}/video-progress/${videoId}`, { completed });
+    return this.http.post(`${this.apiUrl}/module-progress/video/${videoId}`, { completed });
   }
 
   updateTestProgress(moduleId: number, completed: boolean): Observable<any> {

@@ -32,7 +32,6 @@ import { CourseReviewComponent } from './pages/student and instructor/course-rev
 // Payment components
 import { PaymentSuccessComponent } from './pages/payment-success/payment-success.component';
 import { PaymentHistoryComponent } from './pages/payment-history/payment-history.component';
-import { PaymentDemoComponent } from './pages/payment-demo/payment-demo.component';
 import { PaymentGatewayComponent } from './pages/payment-gateway/payment-gateway.component';
 import { PaymentManagementComponent } from './pages/payment-management/payment-management.component';
 import { ZaloPayCallbackComponent } from './pages/zalopay-callback/zalopay-callback.component';
@@ -92,12 +91,12 @@ export const routes: Routes = [
   // Payment routes
   { path: 'payment-success', component: PaymentSuccessComponent, data: { title: 'Kết quả thanh toán' } },
   { path: 'payment-history', component: PaymentHistoryComponent, data: { title: 'Lịch sử thanh toán' }, canActivate: [authGuard] },
-  { path: 'payment-demo', component: PaymentDemoComponent, data: { title: 'Demo Thanh toán' }, canActivate: [authGuard] },
   { path: 'payment-gateway', component: PaymentGatewayComponent, data: { title: 'Payment Gateway Test' }, canActivate: [authGuard] },
   { path: 'payment-management', component: PaymentManagementComponent, data: { title: 'Payment Management' }, canActivate: [authGuard] },
   { path: 'zalopay-callback', component: ZaloPayCallbackComponent, data: { title: 'ZaloPay Callback' } },
   
-  // Legacy redirects for old component names
+  // Legacy redirects for old component names - redirect to payment-gateway
   { path: 'vnpay-test', redirectTo: '/payment-gateway', pathMatch: 'full' },
+  { path: 'payment-demo', redirectTo: '/payment-gateway', pathMatch: 'full' },
     
 ];

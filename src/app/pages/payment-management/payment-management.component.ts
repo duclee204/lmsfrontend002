@@ -279,7 +279,7 @@ export class PaymentManagementComponent implements OnInit {
   }
 
   checkAuth() {
-    this.isAuthenticated = this.authService.isLoggedIn();
+    this.isAuthenticated = this.authService.isAuthenticated();
     console.log('Auth status:', this.isAuthenticated);
   }
 

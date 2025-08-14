@@ -4,37 +4,37 @@ import { FormsModule } from '@angular/forms';
 import { PaymentService } from '../../services/payment.service';
 
 @Component({
-  selector: 'app-vnpay-test',
+  selector: 'app-payment-gateway',
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
     <div class="container mt-4">
-      <h2>VNPay Configuration Test</h2>
+      <h2>Payment Gateway Test</h2>
       
       <div class="row">
         <div class="col-md-8">
-          <!-- VNPay Config Check -->
+          <!-- Payment Gateway Config Check -->
           <div class="card mb-4">
             <div class="card-header">
-              <h5>VNPay Configuration</h5>
+              <h5>Payment Gateway Configuration</h5>
             </div>
             <div class="card-body">
-              <button class="btn btn-info" (click)="checkVNPayConfig()" [disabled]="isLoading">
+              <button class="btn btn-info" (click)="checkPaymentConfig()" [disabled]="isLoading">
                 <i class="fas fa-check-circle me-2"></i>
-                Check VNPay Config
+                Check Payment Config
               </button>
               
-              <div *ngIf="vnpayConfig" class="mt-3">
+              <div *ngIf="paymentConfig" class="mt-3">
                 <h6>Config Status:</h6>
-                <pre>{{ vnpayConfig | json }}</pre>
+                <pre>{{ paymentConfig | json }}</pre>
               </div>
             </div>
           </div>
 
-          <!-- VNPay Payment Test -->
+          <!-- Payment Gateway Test -->
           <div class="card mb-4">
             <div class="card-header">
-              <h5>VNPay Payment Test</h5>
+              <h5>Payment Gateway Test</h5>
             </div>
             <div class="card-body">
               <div class="row">
@@ -58,11 +58,11 @@ import { PaymentService } from '../../services/payment.service';
               
               <button 
                 class="btn btn-primary" 
-                (click)="testVNPayPayment()" 
+                (click)="testPaymentGateway()" 
                 [disabled]="isLoading"
               >
                 <i class="fas fa-credit-card me-2"></i>
-                Test VNPay Payment
+                Test Payment Gateway
               </button>
               
               <div *ngIf="paymentResult" class="mt-3">
@@ -93,23 +93,23 @@ import { PaymentService } from '../../services/payment.service';
         <div class="col-md-4">
           <div class="card">
             <div class="card-header">
-              <h6>VNPay Test Cards</h6>
+              <h6>Test Payment Cards (Sandbox)</h6>
             </div>
             <div class="card-body">
               <div class="mb-3">
                 <strong>NCB Bank</strong><br>
                 <code>9704198526191432198</code><br>
-                <small>NGUYEN VAN A - 07/15</small>
+                <small class="text-muted">NGUYEN VAN A - 07/15</small>
               </div>
               <div class="mb-3">
                 <strong>Techcombank</strong><br>
                 <code>9704061006060005047</code><br>
-                <small>NGUYEN VAN A - 11/19</small>
+                <small class="text-muted">NGUYEN VAN A - 11/19</small>
               </div>
               <div class="mb-3">
                 <strong>OTP SMS</strong><br>
                 <code class="text-primary">123456</code><br>
-                <small>Mã xác thực</small>
+                <small class="text-muted">Verification code</small>
               </div>
             </div>
           </div>
@@ -118,10 +118,10 @@ import { PaymentService } from '../../services/payment.service';
     </div>
   `
 })
-export class VnpayTestComponent implements OnInit {
+export class PaymentGatewayComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
-  vnpayConfig: any = null;
+  paymentConfig: any = null;
   paymentResult: any = null;
 
   testPayment = {
@@ -133,24 +133,24 @@ export class VnpayTestComponent implements OnInit {
   constructor(private paymentService: PaymentService) {}
 
   ngOnInit() {
-    this.checkVNPayConfig();
+    this.checkPaymentConfig();
   }
 
-  async checkVNPayConfig() {
+  async checkPaymentConfig() {
     this.isLoading = true;
     this.errorMessage = '';
     
     try {
-      this.vnpayConfig = await this.paymentService.getVNPayConfig().toPromise();
+      this.paymentConfig = await this.paymentService.getVNPayConfig().toPromise();
     } catch (error: any) {
-      console.error('Error checking VNPay config:', error);
-      this.errorMessage = error.message || 'Failed to check VNPay config';
+      console.error('Error checking payment config:', error);
+      this.errorMessage = error.message || 'Failed to check payment configuration';
     } finally {
       this.isLoading = false;
     }
   }
 
-  async testVNPayPayment() {
+  async testPaymentGateway() {
     this.isLoading = true;
     this.errorMessage = '';
     this.paymentResult = null;
@@ -160,14 +160,14 @@ export class VnpayTestComponent implements OnInit {
       
       if (this.paymentResult.success && this.paymentResult.paymentUrl) {
         // Optionally open payment URL
-        const openUrl = confirm('Open VNPay payment URL in new tab?');
+        const openUrl = confirm('Open payment URL in new tab?');
         if (openUrl) {
           window.open(this.paymentResult.paymentUrl, '_blank');
         }
       }
     } catch (error: any) {
-      console.error('Error testing VNPay payment:', error);
-      this.errorMessage = error.error?.message || error.message || 'Failed to test VNPay payment';
+      console.error('Error testing payment gateway:', error);
+      this.errorMessage = error.error?.message || error.message || 'Failed to test payment gateway';
     } finally {
       this.isLoading = false;
     }

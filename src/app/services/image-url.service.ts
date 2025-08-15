@@ -37,7 +37,7 @@ export class ImageUrlService {
   getAvatarUrl(avatarUrl: string | null | undefined): string {
     // If no URL provided, use default avatar
     if (!avatarUrl) {
-      return 'assets/pictures/avt.png';
+      return 'https://res.cloudinary.com/dyci7zxpk/image/upload/v1755231878/avt-macdinh_yrecgv.jpg';
     }
     
     // If URL already starts with http/https (Cloudinary), return as is

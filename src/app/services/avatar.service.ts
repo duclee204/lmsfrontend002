@@ -155,7 +155,7 @@ export class AvatarService {
    * @returns string
    */
   getDefaultAvatarUrl(): string {
-    return 'assets/pictures/logocmc.png'; // Sử dụng logo CMC làm avatar mặc định
+    return 'https://res.cloudinary.com/dyci7zxpk/image/upload/v1755231878/avt-macdinh_yrecgv.jpg'; // Avatar mặc định trên Cloudinary
   }
 
   /**

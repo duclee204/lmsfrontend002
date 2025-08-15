@@ -28,87 +28,93 @@
     </div>
     
     <div class="admin-stats">
-      <div class="admin-stat-card">
-        <div class="stat-icon">👥</div>
-        <div class="stat-content">
-          <h3>User Management</h3>
-          <p>Quản lý người dùng hệ thống</p>
-          <button class="nav-btn" onclick="window.location.href='/users'">
-            Xem chi tiết
-          </button>
+      <!-- Loading state -->
+      <div *ngIf="isLoading" class="loading-container">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Đang tải...</span>
         </div>
+        <p>Đang tải dữ liệu dashboard...</p>
       </div>
-      
-      <div class="admin-stat-card">
-        <div class="stat-icon">📚</div>
-        <div class="stat-content">
-          <h3>Course Management</h3>
-          <p>Quản lý toàn bộ khóa học</p>
-          <button class="nav-btn" onclick="window.location.href='/course-management'">
-            Xem chi tiết
-          </button>
+
+      <!-- Dashboard Stats -->
+      <div *ngIf="!isLoading" class="stats-grid">
+        <div class="admin-stat-card" (click)="navigateTo('/user-management')">
+          <div class="stat-icon">👥</div>
+          <div class="stat-content">
+            <h3>User Management</h3>
+            <div class="stat-number">{{ dashboardStats.totalUsers }}</div>
+            <p>Tổng số người dùng</p>
+          </div>
         </div>
-      </div>
-      
-      <div class="admin-stat-card">
-        <div class="stat-icon">🏷️</div>
-        <div class="stat-content">
-          <h3>Category Management</h3>
-          <p>Quản lý danh mục khóa học</p>
-          <button class="nav-btn" onclick="window.location.href='/category'">
-            Xem chi tiết
-          </button>
+        
+        <div class="admin-stat-card" (click)="navigateTo('/course-management')">
+          <div class="stat-icon">📚</div>
+          <div class="stat-content">
+            <h3>Course Management</h3>
+            <div class="stat-number">{{ dashboardStats.totalCourses }}</div>
+            <p>Tổng số khóa học</p>
+          </div>
         </div>
-      </div>
-      
-      <div class="admin-stat-card">
-        <div class="stat-icon">📊</div>
-        <div class="stat-content">
-          <h3>Reports & Analytics</h3>
-          <p>Báo cáo và thống kê</p>
-          <button class="nav-btn" onclick="window.location.href='/reports'">
-            Xem chi tiết
-          </button>
+        
+        <div class="admin-stat-card" (click)="navigateTo('/category')">
+          <div class="stat-icon">🏷️</div>
+          <div class="stat-content">
+            <h3>Category Management</h3>
+            <div class="stat-number">{{ dashboardStats.totalCategories }}</div>
+            <p>Quản lý danh mục khóa học</p>
+          </div>
         </div>
-      </div>
-      
-      <div class="admin-stat-card">
-        <div class="stat-icon">⚙️</div>
-        <div class="stat-content">
-          <h3>System Settings</h3>
-          <p>Cấu hình hệ thống</p>
-          <button class="nav-btn" onclick="window.location.href='/settings'">
-            Xem chi tiết
-          </button>
+        
+        <div class="admin-stat-card" (click)="navigateTo('/payment-management')">
+          <div class="stat-icon">�</div>
+          <div class="stat-content">
+            <h3>Payment Management</h3>
+            <div class="stat-number">{{ dashboardStats.totalPayments }}</div>
+            <p>Tổng số giao dịch</p>
+          </div>
         </div>
-      </div>
-      
-      <div class="admin-stat-card">
-        <div class="stat-icon">📝</div>
-        <div class="stat-content">
-          <h3>System Logs</h3>
-          <p>Nhật ký hệ thống</p>
-          <button class="nav-btn" onclick="window.location.href='/Dashboard'">
-            Xem chi tiết
-          </button>
+        
+        <div class="admin-stat-card" (click)="navigateTo('/registration-statistics')">
+          <div class="stat-icon">📊</div>
+          <div class="stat-content">
+            <h3>Reports & Analytics</h3>
+            <div class="stat-number">📈</div>
+            <p>Báo cáo và thống kê</p>
+          </div>
+        </div>
+        
+        <div class="admin-stat-card" (click)="navigateTo('/grades')">
+          <div class="stat-icon">🎯</div>
+          <div class="stat-content">
+            <h3>Grade Management</h3>
+            <div class="stat-number">📝</div>
+            <p>Quản lý điểm số</p>
+          </div>
         </div>
       </div>
     </div>
     
     <div class="recent-activities">
-      <h2>Hoạt động gần đây</h2>
-      <div class="activity-list">
-        <div class="activity-item">
-          <span class="activity-time">2 phút trước</span>
-          <span class="activity-desc">Người dùng mới đăng ký: john&#64;example.com</span>
+      <h2>🕒 Hoạt động gần đây</h2>
+      
+      <!-- Loading state for activities -->
+      <div *ngIf="isLoading" class="activity-loading">
+        <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+        <span>Đang tải hoạt động...</span>
+      </div>
+
+      <!-- Activities list -->
+      <div *ngIf="!isLoading" class="activity-list">
+        <div *ngIf="recentActivities.length === 0" class="no-activities">
+          <p>Chưa có hoạt động nào gần đây</p>
         </div>
-        <div class="activity-item">
-          <span class="activity-time">15 phút trước</span>
-          <span class="activity-desc">Khóa học "Angular 18 Advanced" được tạo</span>
-        </div>
-        <div class="activity-item">
-          <span class="activity-time">1 giờ trước</span>
-          <span class="activity-desc">100 người dùng đang online</span>
+        
+        <div *ngFor="let activity of recentActivities" class="activity-item">
+          <div class="activity-icon">{{ getActivityIcon(activity.type) }}</div>
+          <div class="activity-content">
+            <span class="activity-desc">{{ activity.description }}</span>
+            <span class="activity-time">{{ activity.timestamp }}</span>
+          </div>
         </div>
       </div>
     </div>

@@ -176,7 +176,7 @@ export class CourseReviewsModalComponent implements OnInit, OnChanges {
 
   getAvatarUrl(avatarUrl: string | undefined): string {
     if (!avatarUrl) {
-      return 'assets/default-avatar.png';
+      return 'https://res.cloudinary.com/dyci7zxpk/image/upload/v1755231878/avt-macdinh_yrecgv.jpg';
     }
     
     if (avatarUrl.startsWith('http')) {
@@ -191,7 +191,7 @@ export class CourseReviewsModalComponent implements OnInit, OnChanges {
   }
 
   onAvatarError(event: any) {
-    event.target.src = 'assets/default-avatar.png';
+    event.target.src = 'https://res.cloudinary.com/dyci7zxpk/image/upload/v1755231878/avt-macdinh_yrecgv.jpg';
   }
 
   onEnrollCourse() {

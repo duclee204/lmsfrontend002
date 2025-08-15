@@ -1,0 +1,273 @@
+<div *ngIf="isVisible" class="modal-overlay" (click)="onClose()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <h3 class="modal-title">
+        <i class="fas fa-star me-2"></i>
+        Đánh giá khóa học: {{ courseName }}
+      </h3>
+      <button type="button" class="btn-close" (click)="onClose()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Modal Body with 2-column layout -->
+    <div class="modal-body">
+      <div class="content-layout">
+        <!-- Left Column: Reviews -->
+        <div class="reviews-column">
+          <!-- Course Rating Summary -->
+          <div *ngIf="reviews.length > 0" class="rating-summary mb-4">
+            <div class="overall-rating">
+              <div class="rating-score">
+                <span class="score">{{ averageRating.toFixed(1) }}</span>
+                <div class="stars">
+                  <i *ngFor="let star of getStarArray(averageRating)" 
+                     [class]="star ? 'fas fa-star text-warning' : 'far fa-star text-muted'"></i>
+                </div>
+              </div>
+              <div class="rating-info">
+                <span class="total-reviews">{{ reviews.length }} đánh giá</span>
+                <div class="rating-breakdown">
+                  <div *ngFor="let rating of ratingBreakdown" class="rating-bar">
+                    <span class="rating-label">{{ rating.stars }} sao</span>
+                    <div class="progress">
+                      <div class="progress-bar" [style.width.%]="rating.percentage"></div>
+                    </div>
+                    <span class="rating-count">{{ rating.count }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- No Reviews State -->
+          <div *ngIf="reviews.length === 0 && !loading" class="empty-reviews">
+            <i class="fas fa-star-o empty-icon"></i>
+            <h4>Chưa có đánh giá nào</h4>
+            <p>Khóa học này chưa có đánh giá từ học viên.</p>
+          </div>
+
+          <!-- Loading State -->
+          <div *ngIf="loading" class="loading-state">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Đang tải...</span>
+            </div>
+          </div>
+
+          <!-- Reviews List -->
+          <div class="reviews-list">
+            <h4 class="section-title">Đánh giá từ học viên</h4>
+            
+            <div *ngFor="let review of paginatedReviews" class="review-item">
+              <div class="review-header">
+                <div class="reviewer-info">
+                  <div class="reviewer-avatar">
+                    <img *ngIf="review.avatarUrl" 
+                         [src]="getAvatarUrl(review.avatarUrl)" 
+                         [alt]="review.fullName || 'Avatar'"
+                         class="avatar-img"
+                         (error)="onAvatarError($event)">
+                    <i *ngIf="!review.avatarUrl" class="fas fa-user-circle default-avatar"></i>
+                  </div>
+                  <div class="reviewer-details">
+                    <span class="reviewer-name">{{ review.fullName || 'Ẩn danh' }}</span>
+                    <div class="review-rating">
+                      <i *ngFor="let star of getStarArray(review.rating)" 
+                         [class]="star ? 'fas fa-star text-warning' : 'far fa-star text-muted'"></i>
+                    </div>
+                  </div>
+                </div>
+                <span class="review-date">{{ formatDate(review.createdAt || '') }}</span>
+              </div>
+              
+              <div class="review-content">
+                <p>{{ review.comment }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pagination -->
+          <div *ngIf="totalPages > 1" class="pagination-controls">
+            <button 
+              class="btn btn-sm btn-outline-primary" 
+              (click)="previousPage()" 
+              [disabled]="currentPage === 1"
+            >
+              <i class="fas fa-chevron-left"></i>
+              Trước
+            </button>
+            
+            <span class="page-info">
+              Trang {{ currentPage }} / {{ totalPages }}
+            </span>
+            
+            <button 
+              class="btn btn-sm btn-outline-primary" 
+              (click)="nextPage()" 
+              [disabled]="currentPage === totalPages"
+            >
+              Sau
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+        <!-- End of reviews-column -->
+
+        <!-- Right Column: Course Info -->
+        <div class="course-info-column">
+          <div class="course-card">
+            <div *ngIf="courseInfo; else noCourseInfo">
+              <!-- Course Image -->
+              <div class="course-image">
+                <img [src]="getCourseImageUrl(courseInfo.thumbnailUrl)" 
+                     [alt]="courseName" 
+                     class="course-thumbnail"
+                     (error)="onImageError($event)">
+              </div>
+
+              <!-- Course Details -->
+              <div class="course-details">
+                <h4 class="course-title">{{ courseName }}</h4>
+                
+                <div class="course-meta">
+                  <div class="meta-item" *ngIf="courseInfo.price !== undefined">
+                    <span class="meta-label">Giá:</span>
+                    <span class="meta-value" [class]="courseInfo.price > 0 ? 'price-paid' : 'price-free'">
+                      {{ courseInfo.price > 0 ? formatPrice(courseInfo.price) : 'MIỄN PHÍ' }}
+                    </span>
+                  </div>
+                  
+                  <div class="meta-item" *ngIf="courseInfo.categoryName">
+                    <span class="meta-label">Danh mục:</span>
+                    <span class="meta-value">{{ courseInfo.categoryName }}</span>
+                  </div>
+                  
+                  <div class="meta-item" *ngIf="courseInfo.instructorName">
+                    <span class="meta-label">Giảng viên:</span>
+                    <span class="meta-value">{{ courseInfo.instructorName }}</span>
+                  </div>
+                  
+                  <div class="meta-item" *ngIf="reviews.length > 0">
+                    <span class="meta-label">Đánh giá:</span>
+                    <span class="meta-value">
+                      {{ averageRating.toFixed(1) }}/5 ({{ reviews.length }} đánh giá)
+                    </span>
+                  </div>
+                </div>
+
+                <div class="course-description" *ngIf="courseInfo.description">
+                  <h6>Mô tả khóa học:</h6>
+                  <p>{{ courseInfo.description }}</p>
+                </div>
+              </div>
+
+              <!-- Enrollment Action -->
+              <div class="enrollment-section">
+                <div *ngIf="isEnrolled" class="enrolled-status">
+                  <i class="fas fa-check-circle text-success me-2"></i>
+                  Bạn đã đăng ký khóa học này
+                </div>
+                
+                <div *ngIf="!isEnrolled" class="enrollment-actions">
+                  <button 
+                    *ngIf="!userLoggedIn" 
+                    class="btn btn-primary btn-block mb-2"
+                    (click)="onPurchaseClick()">
+                    <i class="fas fa-shopping-cart me-2"></i>
+                    Mua ngay
+                  </button>
+                  
+                  <button 
+                    *ngIf="userLoggedIn && courseInfo?.price > 0" 
+                    class="btn btn-success btn-block"
+                    (click)="onEnrollCourse()">
+                    <i class="fas fa-credit-card me-2"></i>
+                    Mua ngay
+                  </button>
+                  
+                  <button 
+                    *ngIf="userLoggedIn && courseInfo?.price === 0" 
+                    class="btn btn-success btn-block"
+                    (click)="onEnrollCourse()">
+                    <i class="fas fa-plus me-2"></i>
+                    Mua ngay
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <ng-template #noCourseInfo>
+              <div class="course-details">
+                <h4 class="course-title">{{ courseName || 'Khóa học' }}</h4>
+                <p class="text-muted">Đang tải thông tin khóa học...</p>
+              </div>
+              <div class="enrollment-section">
+                <button class="btn btn-secondary btn-block" disabled>
+                  <i class="fas fa-spinner fa-spin me-2"></i>
+                  Đóng
+                </button>
+                <button class="btn btn-success btn-block" disabled>
+                  <i class="fas fa-spinner fa-spin me-2"></i>
+                  Thanh toán
+                </button>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+        <!-- End of course-info-column -->
+      </div>
+      <!-- End of content-layout -->
+    </div>
+    <!-- End of modal-body -->
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button 
+        *ngIf="canWriteReview" 
+        type="button" 
+        class="btn btn-primary me-2" 
+        (click)="navigateToWriteReview()"
+      >
+        <i class="fas fa-edit me-2"></i>
+        Viết đánh giá
+      </button>
+      <button type="button" class="btn btn-secondary" (click)="onClose()">
+        Đóng
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirmation Modal for Login/Register -->
+<div *ngIf="showLoginConfirmModal" class="modal-overlay" (click)="closeLoginConfirmModal()">
+  <div class="confirmation-modal" (click)="$event.stopPropagation()">
+    <div class="confirmation-header">
+      <h4>
+        <i class="fas fa-user-circle me-2"></i>
+        Bạn có tài khoản chưa?
+      </h4>
+      <button type="button" class="btn-close-confirm" (click)="closeLoginConfirmModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="confirmation-body">
+      <p class="text-center mb-4">
+        Để mua khóa học này, bạn cần có tài khoản. Hãy chọn một trong hai tùy chọn bên dưới:
+      </p>
+      
+      <div class="confirmation-buttons">
+        <button class="btn btn-primary btn-block" (click)="goToLogin()">
+          <i class="fas fa-sign-in-alt me-2"></i>
+          Tôi đã có tài khoản - Đăng nhập
+        </button>
+        
+        <button class="btn btn-success btn-block" (click)="goToRegister()">
+          <i class="fas fa-user-plus me-2"></i>
+          Tôi chưa có tài khoản - Đăng ký
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

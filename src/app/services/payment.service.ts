@@ -43,6 +43,8 @@ export interface PaymentHistory {
   transactionId: string;
   createdAt: string;
   paidAt: string;
+  userName?: string; // Thêm field cho admin view
+  userEmail?: string; // Thêm field cho admin view
 }
 
 export interface PaymentCheckResponse {
@@ -82,6 +84,13 @@ export class PaymentService {
    */
   getPaymentHistory(): Observable<PaymentHistory[]> {
     return this.http.get<PaymentHistory[]>(`${this.apiUrl}/history`);
+  }
+
+  /**
+   * Lấy tất cả giao dịch thanh toán (chỉ dành cho admin)
+   */
+  getAllPaymentHistory(): Observable<PaymentHistory[]> {
+    return this.http.get<PaymentHistory[]>(`${this.apiUrl}/admin/all-payments`);
   }
 
   /**

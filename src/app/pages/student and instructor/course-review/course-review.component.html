@@ -24,7 +24,6 @@
     <div class="header">
       <h1 class="title">Đánh giá khóa học</h1>
       <p class="subtitle" *ngIf="username">
-        Xin chào, {{ username }}
         <span *ngIf="sessionService.isInstructor()">(Giảng viên)</span>
         <span *ngIf="sessionService.isStudent()">(Sinh viên)</span>
         <span *ngIf="sessionService.isAdmin()">(Quản trị viên)</span>
@@ -97,11 +96,123 @@
       </div>
     </div>
 
-    <!-- Instructor/Admin View: Reviews -->
-    <div *ngIf="(sessionService.isInstructor() || sessionService.isAdmin()) && !loading" class="reviews-section">
+    <!-- Admin View: All Courses and Reviews -->
+    <div *ngIf="sessionService.isAdmin() && !loading" class="admin-section">
+      <!-- Show all courses -->
+      <div *ngIf="showAllCourses" class="all-courses-section">
+        <div class="section-header card">
+          <h2>Tất cả khóa học</h2>
+          <p>Click vào khóa học để xem các đánh giá</p>
+        </div>
+
+        <div class="courses-grid" *ngIf="paginatedCourses.length > 0">
+          <div class="course-card card" *ngFor="let course of paginatedCourses" (click)="selectCourseForAdmin(course)">
+            <img [src]="getImageUrl(course.thumbnailUrl)" alt="Course Image" class="course-image">
+            <div class="course-content">
+              <h3>{{ course.title }}</h3>
+              <p>{{ course.description }}</p>
+              <button class="btn btn-primary view-reviews-btn">
+                <i class="fas fa-star"></i> Xem đánh giá
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-container" *ngIf="totalPages > 1">
+          <div class="pagination">
+            <button 
+              class="pagination-btn" 
+              (click)="previousPage()" 
+              [disabled]="currentPage === 1">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            
+            <button 
+              *ngFor="let page of getPageNumbers()" 
+              class="pagination-btn"
+              [class.active]="page === currentPage"
+              (click)="goToPage(page)">
+              {{ page }}
+            </button>
+            
+            <button 
+              class="pagination-btn" 
+              (click)="nextPage()" 
+              [disabled]="currentPage === totalPages">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+          
+          <div class="pagination-info">
+            Trang {{ currentPage }} / {{ totalPages }} ({{ allCourses.length }} khóa học)
+          </div>
+        </div>
+
+        <div *ngIf="allCourses.length === 0" class="no-courses card">
+          <div class="empty-state">
+            <i class="fas fa-book"></i>
+            <h3>Chưa có khóa học nào</h3>
+            <p>Hệ thống chưa có khóa học nào được tạo.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Show reviews for selected course -->
+      <div *ngIf="!showAllCourses && selectedCourse" class="selected-course-reviews">
+        <div class="course-header card">
+          <img [src]="getImageUrl(selectedCourse.courseImage)" alt="Course Image" class="course-image">
+          <div class="course-header-content">
+            <h2>{{ selectedCourse.courseTitle }}</h2>
+            <p>{{ selectedCourse.description }}</p>
+            <button class="btn btn-secondary" (click)="backToAllCourses()">
+              <i class="fas fa-arrow-left"></i> Quay lại danh sách khóa học
+            </button>
+          </div>
+        </div>
+
+        <!-- Course Reviews -->
+        <div class="course-reviews-section">
+          <h3>Đánh giá khóa học ({{ courseReviews.length }})</h3>
+          
+          <div class="reviews-list" *ngIf="courseReviews.length > 0">
+            <div class="review-item card" *ngFor="let review of courseReviews">
+              <div class="review-header">
+                <img [src]="getAvatarUrl(review.avatarUrl)" alt="Avatar" class="reviewer-avatar">
+                <div class="reviewer-info">
+                  <strong>{{ review.fullName }}</strong>
+                  <span class="review-date">{{ review.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+                <button class="btn btn-danger btn-sm" (click)="deleteReview(review.reviewId!)">
+                  <i class="fas fa-trash"></i> Xóa
+                </button>
+              </div>
+              <div class="rating">
+                <i class="fa fa-star" 
+                   *ngFor="let star of getStarArray(review.rating)" 
+                   [class.filled]="isStarFilled(star, review.rating)">
+                </i>
+                <span>{{ review.rating }}.0</span>
+              </div>
+              <p class="review-comment" *ngIf="review.comment">{{ review.comment }}</p>
+            </div>
+          </div>
+
+          <div *ngIf="courseReviews.length === 0" class="no-reviews card">
+            <div class="empty-state">
+              <i class="fas fa-star"></i>
+              <h3>Chưa có đánh giá nào</h3>
+              <p>Khóa học này chưa có đánh giá từ học viên.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Instructor View: Reviews -->
+    <div *ngIf="sessionService.isInstructor() && !loading" class="reviews-section">
       <div class="section-header card">
-        <h2 *ngIf="sessionService.isInstructor()">Đánh giá các khóa học của bạn</h2>
-        <h2 *ngIf="sessionService.isAdmin()">Tất cả đánh giá</h2>
+        <h2>Đánh giá các khóa học của bạn</h2>
       </div>
 
       <div class="reviews-list" *ngIf="courseReviews.length > 0">
@@ -113,9 +224,6 @@
               <span class="review-date">{{ review.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
             </div>
             <div class="course-title">{{ review.courseTitle }}</div>
-            <button *ngIf="sessionService.isAdmin()" class="btn btn-danger btn-sm" (click)="deleteReview(review.reviewId!)">
-              Xóa
-            </button>
           </div>
           <div class="rating">
             <i class="fa fa-star" 
@@ -129,8 +237,7 @@
       </div>
 
       <div *ngIf="courseReviews.length === 0" class="no-reviews card">
-        <p *ngIf="sessionService.isInstructor()">Chưa có đánh giá nào cho các khóa học của bạn.</p>
-        <p *ngIf="sessionService.isAdmin()">Chưa có đánh giá nào trong hệ thống.</p>
+        <p>Chưa có đánh giá nào cho các khóa học của bạn.</p>
       </div>
     </div>
 

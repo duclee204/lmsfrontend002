@@ -59,6 +59,11 @@ export class CourseReviewService {
     return this.apiService.get<CourseCompletionDTO>(`${this.moduleApiUrl}/course/${courseId}/completion`);
   }
 
+  // Get reviews by course (public - no authentication required)
+  getPublicReviewsByCourse(courseId: number): Observable<CourseReview[]> {
+    return this.apiService.get<CourseReview[]>(`${this.apiUrl}/public/course/${courseId}`);
+  }
+
   // Get reviews by course
   getReviewsByCourse(courseId: number): Observable<CourseReview[]> {
     return this.apiService.get<CourseReview[]>(`${this.apiUrl}/course/${courseId}`);

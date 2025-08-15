@@ -286,6 +286,7 @@
   padding: 25px;
   border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 
   h3 {
     color: #2c3e50;
@@ -294,43 +295,69 @@
     margin: 0 0 20px 0;
     text-align: center;
   }
+
+  @media (max-width: 768px) {
+    padding: 20px;
+
+    h3 {
+      font-size: 16px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    padding: 15px;
+
+    h3 {
+      font-size: 14px;
+    }
+  }
 }
 
 .chart {
-  height: 300px;
+  height: 320px;
   position: relative;
+  padding-bottom: 30px;
 }
 
 .chart-bars {
   display: flex;
   align-items: flex-end;
-  justify-content: space-between;
-  height: 100%;
-  gap: 5px;
-  padding: 0 10px;
+  justify-content: space-evenly;
+  height: 280px;
+  gap: 8px;
+  padding: 0 15px;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .bar-container {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-end;
   height: 100%;
   flex: 1;
   position: relative;
+  max-width: 60px;
+  min-width: 30px;
 }
 
 .bar {
   width: 100%;
-  max-width: 30px;
+  max-width: 100%;
+  min-width: 20px;
   background: linear-gradient(180deg, #3498db, #2980b9);
   border-radius: 4px 4px 0 0;
   position: relative;
   transition: all 0.3s ease;
   cursor: pointer;
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: center;
-  padding: 5px 0;
+  padding: 5px 2px;
+  transform-origin: bottom;
+  box-sizing: border-box;
 
   &.daily-bar {
     background: linear-gradient(180deg, #e74c3c, #c0392b);
@@ -369,10 +396,69 @@
   font-size: 11px;
   color: #7f8c8d;
   font-weight: 500;
-  margin-top: 8px;
   text-align: center;
-  transform: rotate(-45deg);
   white-space: nowrap;
+  position: absolute;
+  bottom: -25px;
+  left: 50%;
+  transform: translateX(-50%) rotate(25deg);
+  transform-origin: center;
+
+  @media (max-width: 768px) {
+    font-size: 10px;
+    transform: translateX(-50%) rotate(30deg);
+    bottom: -22px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 9px;
+    transform: translateX(-50%) rotate(35deg);
+    bottom: -20px;
+  }
+}
+
+// Responsive adjustments for chart bars
+@media (max-width: 768px) {
+  .chart-bars {
+    gap: 6px;
+    padding: 0 12px;
+  }
+
+  .bar-container {
+    max-width: 50px;
+    min-width: 25px;
+  }
+
+  .bar {
+    padding: 4px 2px;
+  }
+}
+
+@media (max-width: 480px) {
+  .chart {
+    height: 280px;
+    padding-bottom: 25px;
+  }
+
+  .chart-bars {
+    height: 240px;
+    gap: 4px;
+    padding: 0 8px;
+  }
+
+  .bar-container {
+    max-width: 40px;
+    min-width: 20px;
+  }
+
+  .bar {
+    padding: 3px 1px;
+  }
+
+  .bar-value {
+    font-size: 10px;
+    padding: 1px 4px;
+  }
 }
 
 // Recent Users Section

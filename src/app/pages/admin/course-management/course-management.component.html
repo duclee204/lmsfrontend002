@@ -128,7 +128,8 @@
                     </div>
                     <div class="form-group">
                       <label>Giá (VNĐ)</label>
-                      <input [(ngModel)]="courseForm.price" type="number" placeholder="0" step="0.01" />
+                      <input [(ngModel)]="courseForm.price" type="number" placeholder="Nhập 0 cho khóa học miễn phí" step="0.01" min="0" />
+                      <small class="form-help-text">Nhập 0 để tạo khóa học miễn phí</small>
                     </div>
                   </div>
                   <div class="form-group">
@@ -166,20 +167,42 @@
           </div>
         </div>
           <!-- Pagination controls -->
-          <div *ngIf="getTotalPages() > 1" class="pagination">
-            <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
-              &lt;
-            </button>
-            <ng-container *ngFor="let page of [].constructor(getTotalPages()); let i = index">
-              <button (click)="goToPage(i + 1)"
-                      [class.active]="currentPage === (i + 1)"
-                      [disabled]="currentPage === (i + 1)">
-                {{ i + 1 }}
-              </button>
-            </ng-container>
-            <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === getTotalPages()">
-              &gt;
-            </button>
+          <div *ngIf="getTotalPages() > 1" class="pagination-container">
+            <nav aria-label="Phân trang khóa học">
+              <ul class="pagination">
+                <!-- Previous Button -->
+                <li class="page-item" [class.disabled]="currentPage === 1">
+                  <button class="page-link" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
+                    <i class="fas fa-chevron-left"></i>
+                    <span class="d-none d-sm-inline" style="margin-left: 5px;">Trước</span>
+                  </button>
+                </li>
+
+                <!-- Page Numbers -->
+                <ng-container *ngFor="let page of [].constructor(getTotalPages()); let i = index">
+                  <li class="page-item" [class.active]="currentPage === (i + 1)">
+                    <button class="page-link" (click)="goToPage(i + 1)">
+                      {{ i + 1 }}
+                    </button>
+                  </li>
+                </ng-container>
+
+                <!-- Next Button -->
+                <li class="page-item" [class.disabled]="currentPage === getTotalPages()">
+                  <button class="page-link" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === getTotalPages()">
+                    <span class="d-none d-sm-inline" style="margin-right: 5px;">Sau</span>
+                    <i class="fas fa-chevron-right"></i>
+                  </button>
+                </li>
+              </ul>
+            </nav>
+
+            <!-- Page Info -->
+            <div class="pagination-info">
+              <span>
+                Trang {{ currentPage }} / {{ getTotalPages() }}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -246,7 +269,8 @@
               </div>
               <div class="form-group">
                 <label>Giá (VNĐ)</label>
-                <input [(ngModel)]="selectedCourse.price" type="number" placeholder="0" step="0.01" />
+                <input [(ngModel)]="selectedCourse.price" type="number" placeholder="Nhập 0 cho khóa học miễn phí" step="0.01" min="0" />
+                <small class="form-help-text">Nhập 0 để tạo khóa học miễn phí</small>
               </div>
             </div>
             <div class="form-group">

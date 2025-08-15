@@ -8,6 +8,7 @@ import { SidebarWrapperComponent } from '../../../components/sidebar-wrapper/sid
 import { ProfileComponent } from '../../../components/profile/profile.component';
 import { NotificationComponent } from '../../../components/notification/notification.component';
 import { UserService } from '../../../services/user.service';
+import { ApiService } from '../../../services/api.service';
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -19,10 +20,17 @@ import { forkJoin } from 'rxjs';
 })
 export class CourseReviewComponent implements OnInit {
   eligibleCourses: CourseReview[] = [];
+  allCourses: any[] = []; // Tất cả khóa học cho admin
+  paginatedCourses: any[] = []; // Khóa học sau khi phân trang
   selectedCourse: CourseReview | null = null;
   courseReviews: CourseReview[] = [];
   myReview: CourseReview | null = null;
   userRole: string = '';
+  
+  // Pagination properties
+  currentPage: number = 1;
+  coursesPerPage: number = 8;
+  totalPages: number = 0;
   
   // Profile component properties
   username: string = '';
@@ -42,6 +50,7 @@ export class CourseReviewComponent implements OnInit {
   showReviewForm: boolean = false;
   isEditing: boolean = false;
   loading: boolean = false;
+  showAllCourses: boolean = true; // Mặc định hiển thị tất cả khóa học cho admin
   
   // Minimum completion percentage required for review
   readonly MIN_COMPLETION_PERCENTAGE = 80;
@@ -50,7 +59,8 @@ export class CourseReviewComponent implements OnInit {
     private courseReviewService: CourseReviewService,
     public sessionService: SessionService,
     private userService: UserService,
-    private imageUrlService: ImageUrlService
+    private imageUrlService: ImageUrlService,
+    private apiService: ApiService
   ) {}
 
   ngOnInit(): void {
@@ -89,8 +99,100 @@ export class CourseReviewComponent implements OnInit {
     } else if (this.sessionService.isInstructor()) {
       this.loadInstructorReviews();
     } else if (this.sessionService.isAdmin()) {
-      this.loadAllReviews();
+      this.loadAllCourses(); // Load tất cả khóa học cho admin
     }
+  }
+
+  // Load tất cả khóa học cho admin
+  loadAllCourses(): void {
+    this.apiService.getAllCourses().subscribe({
+      next: (courses) => {
+        this.allCourses = courses;
+        this.totalPages = Math.ceil(courses.length / this.coursesPerPage);
+        this.currentPage = 1;
+        this.updatePaginatedCourses();
+        this.showAllCourses = true;
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading courses:', error);
+        this.loading = false;
+      }
+    });
+  }
+
+  // Cập nhật danh sách khóa học theo trang hiện tại
+  updatePaginatedCourses(): void {
+    const startIndex = (this.currentPage - 1) * this.coursesPerPage;
+    const endIndex = startIndex + this.coursesPerPage;
+    this.paginatedCourses = this.allCourses.slice(startIndex, endIndex);
+  }
+
+  // Chuyển trang
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.updatePaginatedCourses();
+    }
+  }
+
+  // Trang trước
+  previousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePaginatedCourses();
+    }
+  }
+
+  // Trang tiếp theo
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.updatePaginatedCourses();
+    }
+  }
+
+  // Lấy array các số trang để hiển thị
+  getPageNumbers(): number[] {
+    const pages: number[] = [];
+    const maxPagesToShow = 5;
+    let startPage = Math.max(1, this.currentPage - Math.floor(maxPagesToShow / 2));
+    let endPage = Math.min(this.totalPages, startPage + maxPagesToShow - 1);
+    
+    // Điều chỉnh startPage nếu endPage đạt giới hạn
+    if (endPage - startPage + 1 < maxPagesToShow) {
+      startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+    
+    return pages;
+  }
+
+  // Khi admin click vào khóa học
+  selectCourseForAdmin(course: any): void {
+    // Chuyển đổi course thành CourseReview format
+    const courseReview: CourseReview = {
+      courseId: course.courseId || course.id,
+      courseTitle: course.title,
+      courseImage: course.thumbnailUrl,
+      description: course.description,
+      rating: 0,
+      hasReviewed: false
+    };
+    
+    this.selectedCourse = courseReview;
+    this.showAllCourses = false;
+    this.loadCourseReviews(courseReview.courseId);
+  }
+
+  // Quay lại danh sách tất cả khóa học (cho admin)
+  backToAllCourses(): void {
+    this.showAllCourses = true;
+    this.selectedCourse = null;
+    this.courseReviews = [];
   }
 
   loadEligibleCourses(): void {
@@ -145,6 +247,7 @@ export class CourseReviewComponent implements OnInit {
         this.loading = false;
       },
       error: (error) => {
+        console.error('Error loading instructor reviews:', error);
         this.loading = false;
       }
     });

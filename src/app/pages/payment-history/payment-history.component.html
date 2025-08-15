@@ -1,14 +1,31 @@
-<div class="payment-history-container">
-  <div class="page-header">
-    <h2 class="page-title">
-      <i class="fas fa-history me-2"></i>
-      Lịch sử thanh toán
-    </h2>
-    <button class="btn btn-primary btn-sm" (click)="loadPaymentHistory()">
-      <i class="fas fa-sync-alt me-2"></i>
-      Làm mới
-    </button>
-  </div>
+<div class="payment-history-layout">
+  <aside class="sidebar" role="complementary" aria-label="Sidebar navigation">
+    <app-sidebar-wrapper></app-sidebar-wrapper>
+  </aside>
+  
+  <div class="payment-history-content">
+    <!-- Profile component -->
+    <div class="profile-header">
+      <app-profile 
+        [username]="username"
+        [role]="getDisplayRole(userRole)"
+        [avatarUrl]="avatarUrl"
+        (profileUpdate)="onProfileUpdate()"
+        (logout)="onLogout()">
+      </app-profile>
+    </div>
+
+    <div class="payment-history-container">
+      <div class="page-header">
+        <h2 class="page-title">
+          <i class="fas fa-history me-2"></i>
+          {{ userRole === 'admin' ? 'Payment Management - All Transactions' : 'Lịch sử thanh toán' }}
+        </h2>
+        <button class="btn btn-primary btn-sm" (click)="loadPaymentHistory()">
+          <i class="fas fa-sync-alt me-2"></i>
+          {{ userRole === 'admin' ? 'Refresh' : 'Làm mới' }}
+        </button>
+      </div>
 
   <!-- Loading State -->
   <div *ngIf="isLoading" class="loading-container">
@@ -42,6 +59,11 @@
         <div class="payment-course">
           <h5 class="course-title">{{ payment.courseTitle }}</h5>
           <span class="transaction-id">{{ payment.transactionId }}</span>
+          <!-- Hiển thị thông tin user nếu là admin -->
+          <div *ngIf="userRole === 'admin' && payment.userName" class="user-info">
+            <i class="fas fa-user me-1"></i>
+            <span class="user-name">{{ payment.userName }}</span>
+          </div>
         </div>
         <div class="payment-status">
           <span class="badge" [ngClass]="getStatusClass(payment.status)">
@@ -96,6 +118,8 @@
           Giả lập thanh toán thành công
         </button>
       </div>
+    </div>
+  </div>
     </div>
   </div>
 </div>

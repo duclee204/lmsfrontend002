@@ -82,4 +82,14 @@ export class ApiService {
   getAllCourses(): Observable<any[]> {
     return this.get<any[]>('/courses/list');
   }
+
+  // Public method để lấy tất cả khóa học công khai (không cần đăng nhập)
+  getPublicCourses(): Observable<any[]> {
+    return this.get<any[]>('/courses/public');
+  }
+
+  // Public method để lấy tất cả khóa học công khai kèm rating (không cần đăng nhập)
+  getPublicCoursesWithRatings(): Observable<any[]> {
+    return this.get<any[]>('/courses/public-with-ratings');
+  }
 }

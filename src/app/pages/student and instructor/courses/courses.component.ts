@@ -28,6 +28,11 @@ export class CoursesComponent implements OnInit {
   userName: string = '';
   userId: number = 0;
 
+  // Pagination properties
+  currentPage = 1;
+  itemsPerPage = 6; // Number of courses per page (3 columns x 3 rows)
+  totalPages = 1;
+
   // Profile component properties
   username: string = '';
   avatarUrl: string = '';
@@ -39,6 +44,9 @@ export class CoursesComponent implements OnInit {
   // Reviews modal properties
   isReviewsModalVisible = false;
   selectedCourseForReviews: any = null;
+  
+  // Login confirmation modal
+  showLoginConfirmModal = false;
 
   constructor(
     private apiService: ApiService,
@@ -53,7 +61,7 @@ export class CoursesComponent implements OnInit {
   ngOnInit() {
     this.initializeUserProfile();
     this.loadUserInfo();
-    // Chỉ load courses nếu đang trong browser (có token)
+    // Load courses cho tất cả trường hợp - có token hoặc không có token
     if (isPlatformBrowser(this.platformId)) {
       this.loadCourses();
     }
@@ -72,6 +80,35 @@ export class CoursesComponent implements OnInit {
     }
   }
 
+  // Hiển thị thông báo yêu cầu đăng nhập
+  private showLoginRequiredAlert() {
+    this.showLoginConfirmModal = true;
+  }
+
+  closeLoginConfirmModal() {
+    this.showLoginConfirmModal = false;
+  }
+
+  goToLogin() {
+    this.notificationService.show({
+      type: 'info',
+      title: 'Chuyển hướng',
+      message: 'Đang chuyển đến trang đăng nhập...'
+    });
+    this.closeLoginConfirmModal();
+    this.router.navigate(['/login']);
+  }
+
+  goToRegister() {
+    this.notificationService.show({
+      type: 'info', 
+      title: 'Chuyển hướng',
+      message: 'Đang chuyển đến trang đăng ký...'
+    });
+    this.closeLoginConfirmModal();
+    this.router.navigate(['/signup']);
+  }
+
   // Load thông tin user từ token hoặc API
   loadUserInfo() {
     if (isPlatformBrowser(this.platformId)) {
@@ -87,11 +124,16 @@ export class CoursesComponent implements OnInit {
           console.log('User info loaded:', { role: this.userRole, name: this.userName, userId: this.userId });
         } catch (error) {
           console.error('Error decoding token:', error);
-          this.userRole = 'student';
+          this.userRole = '';
+          this.userName = '';
+          this.userId = 0;
         }
       } else {
-        // Không có token, redirect về login
-        this.router.navigate(['/login']);
+        // Không có token - guest user
+        this.userRole = '';
+        this.userName = '';
+        this.userId = 0;
+        console.log('Guest user mode');
       }
     }
   }
@@ -99,6 +141,33 @@ export class CoursesComponent implements OnInit {
   // Load danh sách khóa học theo role
   loadCourses() {
     this.loading = true;
+
+    // Nếu không có token (guest user), chỉ hiển thị tất cả khóa học không có thông tin enrollment
+    if (!this.userRole || this.userId === 0) {
+      this.apiService.getPublicCoursesWithRatings().subscribe({
+        next: (courses) => {
+          this.courses = courses;
+          this.enrolledCourses = [];
+          this.availableCourses = courses;
+          this.updatePagination(); // Add pagination update
+          this.loading = false;
+          console.log('Guest user courses loaded:', {
+            total: courses.length,
+            enrolled: 0,
+            available: courses.length
+          });
+        },
+        error: (err) => {
+          // Với guest user, nếu lỗi thì hiển thị empty state
+          this.courses = [];
+          this.enrolledCourses = [];
+          this.availableCourses = [];
+          this.loading = false;
+          console.log('Guest user - failed to load courses, showing empty state');
+        }
+      });
+      return;
+    }
 
     if (this.sessionService.isStudent()) {
       // Sinh viên: Lấy tất cả khóa học kèm trạng thái đăng ký
@@ -108,6 +177,7 @@ export class CoursesComponent implements OnInit {
           // Phân chia courses thành enrolled và available
           this.enrolledCourses = courses.filter(course => course.enrolled);
           this.availableCourses = courses.filter(course => !course.enrolled);
+          this.updatePagination(); // Add pagination update
           this.loading = false;
           console.log('Student courses loaded:', {
             total: courses.length,
@@ -205,6 +275,12 @@ export class CoursesComponent implements OnInit {
 
   // Vào trang học/quản lý khóa học
   enterCourse(course: any) {
+    // Nếu chưa đăng nhập
+    if (!this.userRole || this.userId === 0) {
+      this.showLoginRequiredAlert();
+      return;
+    }
+
     if (this.sessionService.isInstructor()) {
       this.router.navigate(['/course-home'], { queryParams: { courseId: course.courseId } });
     } else if (this.sessionService.isStudent()) {
@@ -366,11 +442,22 @@ export class CoursesComponent implements OnInit {
 
   // Xem đánh giá khóa học
   viewCourseReviews(course: any) {
-    // Hiển thị modal đánh giá thay vì navigate
+    // Hiển thị modal đánh giá - guest có thể xem đánh giá nhưng không thể viết
     this.selectedCourseForReviews = {
       courseId: course.courseId,
       courseName: this.getCourseTitle(course),
-      canWriteReview: course.enrolled || false // Chỉ cho phép viết đánh giá nếu đã đăng ký
+      canWriteReview: this.userRole && course.enrolled || false, // Chỉ cho phép viết đánh giá nếu đã đăng nhập và đăng ký
+      courseInfo: {
+        courseId: course.courseId,
+        title: this.getCourseTitle(course),
+        description: this.getCourseDescription(course),
+        price: this.getCoursePrice(course),
+        thumbnailUrl: course.thumbnailUrl,
+        categoryName: course.categoryName,
+        instructorName: course.instructorName
+      },
+      userLoggedIn: this.isLoggedIn(),
+      isEnrolled: course.enrolled || false
     };
     this.isReviewsModalVisible = true;
   }
@@ -442,13 +529,13 @@ export class CoursesComponent implements OnInit {
     this.avatarUrl = userInfo.avatarUrl; // ✅ Sử dụng avatar mặc định từ service
   }
 
-  // Format role để hiển thị bằng tiếng Việt
+  // Format role để hiển thị với chữ cái đầu viết hoa
   getDisplayRole(role: string): string {
     const cleanRole = role.replace('ROLE_', '').toLowerCase();
     switch (cleanRole) {
-      case 'admin': return 'Quản trị viên';
-      case 'instructor': return 'Giảng viên';
-      case 'student': return 'Học viên';
+      case 'admin': return 'Admin';
+      case 'instructor': return 'Instructor';
+      case 'student': return 'Student';
       default: return cleanRole.charAt(0).toUpperCase() + cleanRole.slice(1);
     }
   }
@@ -460,5 +547,135 @@ export class CoursesComponent implements OnInit {
 
   onLogout() {
     this.sessionService.logout();
+  }
+
+  // Navigation methods for guest users
+  navigateToLogin() {
+    this.router.navigate(['/login']);
+  }
+
+  navigateToSignup() {
+    this.router.navigate(['/signup']);
+  }
+
+  // Check if user is logged in
+  isLoggedIn(): boolean {
+    return !!(this.userRole && this.userId > 0);
+  }
+
+  // Handle enrollment from reviews modal
+  onEnrollFromModal(courseId: number) {
+    console.log('Enrolling in course from modal:', courseId);
+    
+    // Check if user is logged in
+    if (!this.sessionService.getCurrentUser()) {
+      this.notificationService.show({
+        type: 'warning',
+        title: 'Yêu cầu đăng nhập',
+        message: 'Bạn cần đăng nhập để đăng ký khóa học.'
+      });
+      return;
+    }
+
+    // Find the course
+    const course = this.courses.find(c => c.courseId === courseId);
+    if (!course) {
+      this.notificationService.show({
+        type: 'error',
+        title: 'Lỗi',
+        message: 'Không tìm thấy thông tin khóa học.'
+      });
+      return;
+    }
+
+    // Check if it's a free course
+    if (course.price === 0) {
+      // For free courses, directly enroll
+      this.enrollInFreeCourse(courseId);
+    } else {
+      // For paid courses, open payment modal
+      this.closeReviewsModal(); // Close reviews modal first
+      this.selectedCourseForPayment = course;
+      this.isPaymentModalVisible = true;
+    }
+  }
+
+  // Enroll in free course
+  enrollInFreeCourse(courseId: number) {
+    this.apiService.post(`/enrollments/enroll/${courseId}`, {}).subscribe({
+      next: (response) => {
+        this.notificationService.show({
+          type: 'success',
+          title: 'Đăng ký thành công',
+          message: 'Bạn đã đăng ký khóa học miễn phí thành công!'
+        });
+        
+        // Close modal and refresh courses
+        this.closeReviewsModal();
+        this.loadCourses();
+      },
+      error: (error) => {
+        console.error('Error enrolling in free course:', error);
+        this.notificationService.show({
+          type: 'error',
+          title: 'Lỗi đăng ký',
+          message: error.error?.message || 'Không thể đăng ký khóa học. Vui lòng thử lại sau.'
+        });
+      }
+    });
+  }
+
+  // Pagination methods
+  get paginatedAvailableCourses(): any[] {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    return this.availableCourses.slice(startIndex, endIndex);
+  }
+
+  updatePagination() {
+    this.totalPages = Math.ceil(this.availableCourses.length / this.itemsPerPage);
+    if (this.currentPage > this.totalPages) {
+      this.currentPage = Math.max(1, this.totalPages);
+    }
+  }
+
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+    }
+  }
+
+  previousPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+    }
+  }
+
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
+  }
+
+  getPageNumbers(): number[] {
+    const pages: number[] = [];
+    const maxPages = 5; // Show maximum 5 page numbers
+    
+    if (this.totalPages <= maxPages) {
+      // Show all pages if total is small
+      for (let i = 1; i <= this.totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Show pages around current page
+      const start = Math.max(1, this.currentPage - 2);
+      const end = Math.min(this.totalPages, this.currentPage + 2);
+      
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+    }
+    
+    return pages;
   }
 }

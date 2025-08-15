@@ -238,7 +238,7 @@ export class CourseManagementComponent implements OnInit, AfterViewInit {
   submitCourse(): void {
     const { title, description, categoryId, instructorId, status, price } = this.courseForm;
 
-    if (!title || !description || !categoryId || !instructorId || !status || !price) {
+    if (!title || !description || !categoryId || !instructorId || !status || price === null || price === undefined) {
       this.notificationService.warning('Thông tin chưa đầy đủ', 'Vui lòng nhập đầy đủ tất cả các trường bắt buộc.');
       return;
     }
@@ -294,7 +294,7 @@ updateCourse(): void {
 
   const { title, description, categoryId, instructorId, status, price } = this.selectedCourse;
 
-  if (!title || !description || !categoryId || !instructorId || !status || !price) {
+  if (!title || !description || !categoryId || !instructorId || !status || price === null || price === undefined) {
     this.notificationService.warning('Thông tin chưa đầy đủ', 'Vui lòng nhập đầy đủ tất cả các trường.');
     return;
   }

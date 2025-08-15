@@ -87,7 +87,34 @@ export class SidebaradminComponent implements OnInit {
   }
 
   isActiveRoute(route: string): boolean {
-    const isActive = this.currentRoute === route || this.currentRoute.startsWith(route + '/');
+    // Nếu là route course-management, kiểm tra các trang liên quan đến khóa học
+    if (route === '/course-management') {
+      const courseRelatedRoutes = [
+        '/course-management',
+        '/course-home',
+        '/discussion',
+        '/grades',
+        '/student-grades',
+        '/module',
+        '/video-upload',
+        '/learn-online',
+        '/exam',
+        '/addexam',
+        '/question-manager',
+        '/take-exam'
+      ];
+      
+      // Lấy path từ URL (bỏ query parameters)
+      const currentPath = this.currentRoute.split('?')[0];
+      
+      return courseRelatedRoutes.some(courseRoute => 
+        currentPath === courseRoute || currentPath.startsWith(courseRoute + '/')
+      );
+    }
+    
+    // Cho các route khác, sử dụng logic mặc định (cũng xử lý query parameters)
+    const currentPath = this.currentRoute.split('?')[0];
+    const isActive = currentPath === route || currentPath.startsWith(route + '/');
     return isActive;
   }
 

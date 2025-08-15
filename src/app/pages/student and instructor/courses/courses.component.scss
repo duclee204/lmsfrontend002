@@ -29,6 +29,22 @@
     margin-left: 60px;
     padding: 1rem;
   }
+
+  /* No sidebar for guest users - higher specificity */
+  &.no-sidebar {
+    margin-left: 0 !important; /* Force override */
+    padding: 1rem; /* Giảm padding cho guest users */
+    
+    @media (max-width: 768px) {
+      margin-left: 0 !important; /* Force override on mobile */
+      padding: 0.75rem; /* Padding nhỏ hơn trên mobile */
+    }
+    
+    @media (max-width: 480px) {
+      margin-left: 0 !important; /* Force override on small screens */
+      padding: 0.5rem; /* Padding tối thiểu trên màn hình rất nhỏ */
+    }
+  }
 }
 
 /* Profile header styling */
@@ -39,6 +55,30 @@
   padding: 1rem 0;
   margin-bottom: 1rem;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Auth buttons for guest users */
+.auth-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.auth-buttons-desktop {
+  display: flex;
+  gap: 0.5rem;
+  
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+.auth-buttons-mobile {
+  display: none;
+  
+  @media (max-width: 768px) {
+    display: flex;
+  }
 }
 
 .header {
@@ -109,9 +149,40 @@
 /* Courses grid */
 .courses-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 1.5rem;
   margin-top: 2rem;
+  max-width: 1400px; // Increased from 1200px to use more space
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 1rem; // Add padding instead of relying on margin
+}
+
+/* For very large screens, force exactly 3 columns */
+@media (min-width: 1200px) {
+  .courses-grid {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 1350px; // Increased from 1150px to reduce side margins
+  }
+}
+
+/* For medium to large screens, 2 columns */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .courses-grid {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 900px; // Increased from 800px
+    padding: 0 1.5rem; // Add more padding for medium screens
+  }
+}
+
+/* For small screens, 1 column */
+@media (max-width: 767px) {
+  .courses-grid {
+    grid-template-columns: 1fr;
+    max-width: 100%; // Use full width on mobile
+    gap: 1rem;
+    padding: 0 1rem; // Standard mobile padding
+  }
 }
 
 .course-card {
@@ -153,7 +224,7 @@
 .course-header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 1.5rem;
+  padding: 1rem;
   display: flex;
   align-items: flex-start;
   gap: 1rem;
@@ -241,7 +312,7 @@
 }
 
 .course-info {
-  padding: 1.5rem;
+  padding: 1rem;
 }
 
 .course-description {
@@ -287,7 +358,6 @@
 
 /* Actions */
 .course-actions {
-  padding: 1rem 1.5rem;
   background: #f8f9fa;
   display: flex;
   gap: 0.75rem;
@@ -478,9 +548,10 @@
 
 .action-buttons {
   display: flex;
-  gap: 0.5rem;
-  align-items: center;
+  gap: 1rem; // Increased gap from 0.5rem to 1rem for more space between buttons
+  align-items: stretch; // Changed from center to stretch for equal height
   flex-wrap: wrap;
+  justify-content: flex-end; // Push buttons to the right
 }
 
 .btn {
@@ -495,17 +566,20 @@
   align-items: center;
   text-decoration: none;
   white-space: nowrap;
+  min-height: 40px; // Ensure minimum height for all buttons
 }
 
 .btn-sm {
-  padding: 6px 12px;
-  font-size: 0.8rem;
+  padding: 8px 12px; // Increased padding to match regular buttons
+  font-size: 0.85rem; // Slightly larger font
+  min-height: 40px; // Same minimum height as regular buttons
 }
 
 .btn-outline-info {
   background: transparent;
   color: #17a2b8;
   border: 2px solid #17a2b8;
+  min-height: 40px;
   
   &:hover {
     background: #17a2b8;
@@ -519,6 +593,7 @@
   background: linear-gradient(135deg, #28a745, #1e7e34);
   color: white;
   border: 2px solid transparent;
+  min-height: 40px;
   
   &:hover {
     background: linear-gradient(135deg, #1e7e34, #155724);
@@ -531,6 +606,7 @@
   background: linear-gradient(135deg, #007bff, #0056b3);
   color: white;
   border: 2px solid transparent;
+  min-height: 40px;
   
   &:hover {
     background: linear-gradient(135deg, #0056b3, #004085);
@@ -543,11 +619,26 @@
   background: linear-gradient(135deg, #28a745, #1e7e34);
   color: white;
   border: 2px solid transparent;
+  min-height: 40px;
   
   &:hover {
     background: linear-gradient(135deg, #1e7e34, #155724);
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+  }
+}
+
+.btn-login-required {
+  background: linear-gradient(135deg, #ff6b35, #f7931e);
+  color: white;
+  border: 2px solid transparent;
+  font-weight: 600;
+  min-height: 40px;
+  
+  &:hover {
+    background: linear-gradient(135deg, #e55a2b, #e8851a);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
   }
 }
 
@@ -627,5 +718,251 @@
   
   .course-actions {
     justify-content: stretch;
+  }
+}
+
+/* Pagination Styles */
+.pagination-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding: 1.5rem 0;
+}
+
+.pagination {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.page-item {
+  &.disabled .page-link {
+    color: #6c757d;
+    pointer-events: none;
+    cursor: default;
+    background-color: #fff;
+    border-color: #dee2e6;
+    opacity: 0.6;
+  }
+
+  &.active .page-link {
+    z-index: 3;
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff;
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+  }
+}
+
+.page-link {
+  position: relative;
+  display: block;
+  padding: 0.5rem 0.75rem;
+  color: #007bff;
+  text-decoration: none;
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+  transition: all 0.15s ease-in-out;
+  cursor: pointer;
+  font-weight: 500;
+  min-width: 40px;
+  text-align: center;
+
+  &:hover {
+    z-index: 2;
+    color: #0056b3;
+    background-color: #e9ecef;
+    border-color: #adb5bd;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  &:focus {
+    z-index: 3;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+.pagination-info {
+  text-align: center;
+  color: #6c757d;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Responsive pagination */
+@media (max-width: 576px) {
+  .pagination-container {
+    margin-top: 1rem;
+    padding: 1rem 0;
+  }
+
+  .page-link {
+    padding: 0.375rem 0.5rem;
+    font-size: 0.85rem;
+    min-width: 35px;
+  }
+
+  .pagination-info {
+    font-size: 0.8rem;
+  }
+}
+
+/* ===== CONFIRMATION MODAL STYLES ===== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1050;
+  backdrop-filter: blur(4px);
+}
+
+.confirmation-modal {
+  background: white;
+  border-radius: 16px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  animation: modalSlideIn 0.3s ease;
+  position: relative;
+  z-index: 1051;
+}
+
+.confirmation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.confirmation-header h4 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.btn-close-confirm {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.btn-close-confirm:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.confirmation-body {
+  padding: 2rem;
+}
+
+.confirmation-body p {
+  color: #6c757d;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.confirmation-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.confirmation-buttons .btn {
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.confirmation-buttons .btn-primary {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: white;
+}
+
+.confirmation-buttons .btn-primary:hover {
+  background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
+}
+
+.confirmation-buttons .btn-success {
+  background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+  color: white;
+}
+
+.confirmation-buttons .btn-success:hover {
+  background: linear-gradient(135deg, #1e7e34 0%, #155724 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Responsive for confirmation modal */
+@media (max-width: 768px) {
+  .confirmation-modal {
+    max-width: 95%;
+    margin: 1rem;
+  }
+  
+  .confirmation-header,
+  .confirmation-body {
+    padding: 1.25rem;
+  }
+  
+  .confirmation-header h4 {
+    font-size: 1.125rem;
+  }
+  
+  .confirmation-buttons .btn {
+    padding: 0.875rem 1.25rem;
+    font-size: 0.95rem;
   }
 }

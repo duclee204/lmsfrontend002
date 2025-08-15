@@ -11,7 +11,7 @@
     </div>
     <div class="profile-info">
       <p class="profile-name">{{ username }}</p>
-      <p class="profile-role">{{ role }}</p>
+      <p class="profile-role">{{ getDisplayRole() }}</p>
     </div>
     <i class="fas fa-chevron-down"></i>
     <div class="profile-dropdown" [style.display]="profileDropdownVisible ? 'block' : 'none'">

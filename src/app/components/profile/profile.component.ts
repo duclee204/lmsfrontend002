@@ -218,4 +218,18 @@ export class ProfileComponent implements OnInit {
   onAvatarError(event: any) {
     event.target.src = this.avatarService.getDefaultAvatarUrl();
   }
+
+  // Format role for display
+  getDisplayRole(): string {
+    switch (this.role?.toLowerCase()) {
+      case 'admin':
+        return 'Admin';
+      case 'student':
+        return 'Student';
+      case 'instructor':
+        return 'Instructor';
+      default:
+        return this.role || 'Student';
+    }
+  }
 }

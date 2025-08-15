@@ -21,6 +21,7 @@ import { DiscussionComponent } from './pages/student and instructor/discussion/d
 import { authGuard } from './auth.guard';
 import { loginRedirectGuard } from './login-redirect.guard';
 import { adminGuard } from './admin.guard';
+import { homeRedirectGuard } from './home-redirect.guard';
 
 import { ExamResultComponent } from './pages/student and instructor/exam-result/exam-result.component';
 import { UserManagementComponent } from './pages/admin/user-management/user-management.component';
@@ -37,11 +38,11 @@ import { PaymentManagementComponent } from './pages/payment-management/payment-m
 import { ZaloPayCallbackComponent } from './pages/zalopay-callback/zalopay-callback.component';
 
 export const routes: Routes = [
-  { path: '', component: LoginComponent, data: { title: 'Trang đăng nhập' }, canActivate: [loginRedirectGuard] },
+  { path: '', component: CoursesComponent, data: { title: 'Khóa học' }, canActivate: [homeRedirectGuard] },
   { path: 'login', component: LoginComponent, data: { title: 'Trang đăng nhập' }, canActivate: [loginRedirectGuard] },
   { path: 'signup', component: SignupComponent, data: { title: 'Đăng ký tài khoản' }, canActivate: [loginRedirectGuard] },
   { path: 'dashboard', component: DashboardComponent, data: { title: 'Dashboard' }, canActivate: [authGuard] },
-  { path: 'courses', component: CoursesComponent, data: { title: 'Khóa học của tôi' }, canActivate: [authGuard] },
+  { path: 'courses', component: CoursesComponent, data: { title: 'Khóa học' } },
   { path: 'discussion', component: DiscussionComponent, data: { title: 'Thảo luận' }, canActivate: [authGuard] },
   { path: 'learn-online', component: LearnOnlineComponent, data: { title: 'Học trực tuyến' }, canActivate: [authGuard] },
   { path: 'module', component: ModuleComponent, data: { title: 'Quản lý Module' }, canActivate: [authGuard] },
@@ -92,7 +93,7 @@ export const routes: Routes = [
   { path: 'payment-success', component: PaymentSuccessComponent, data: { title: 'Kết quả thanh toán' } },
   { path: 'payment-history', component: PaymentHistoryComponent, data: { title: 'Lịch sử thanh toán' }, canActivate: [authGuard] },
   { path: 'payment-gateway', component: PaymentGatewayComponent, data: { title: 'Payment Gateway Test' }, canActivate: [authGuard] },
-  { path: 'payment-management', component: PaymentManagementComponent, data: { title: 'Payment Management' }, canActivate: [authGuard] },
+  { path: 'payment-management', component: PaymentHistoryComponent, data: { title: 'Payment Management' }, canActivate: [authGuard, adminGuard] },
   { path: 'zalopay-callback', component: ZaloPayCallbackComponent, data: { title: 'ZaloPay Callback' } },
   
   // Legacy redirects for old component names - redirect to payment-gateway

@@ -20,7 +20,6 @@
         Dashboard {{ roleDisplayName }}
       </h1>
       <p class="dashboard-subtitle" *ngIf="userName">
-        Xin chào, <strong>{{ userName }}</strong>
         <span class="role-badge" [class]="userRole.toLowerCase().replace('role_', '')">
           {{ roleDisplayName }}
         </span>

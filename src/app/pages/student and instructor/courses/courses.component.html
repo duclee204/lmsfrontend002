@@ -1,19 +1,42 @@
 <app-notification></app-notification>
 <div class="courses-layout">
-  <aside class="sidebar" role="complementary" aria-label="Sidebar navigation">
+  <aside *ngIf="isLoggedIn()" class="sidebar" role="complementary" aria-label="Sidebar navigation">
     <app-sidebar-wrapper></app-sidebar-wrapper>
   </aside>
   
-  <div class="courses-container">
-    <!-- Profile component -->
+  <div class="courses-container" [class.no-sidebar]="!isLoggedIn()">
+    <!-- Profile component hoặc Login/Signup buttons -->
     <div class="profile-header">
+      <!-- Hiển thị profile nếu đã đăng nhập -->
       <app-profile 
+        *ngIf="isLoggedIn()"
         [username]="username"
         [role]="getDisplayRole(userRole)"
         [avatarUrl]="avatarUrl"
         (profileUpdate)="onProfileUpdate()"
         (logout)="onLogout()">
       </app-profile>
+      
+      <!-- Hiển thị nút login/signup nếu chưa đăng nhập -->
+      <div *ngIf="!isLoggedIn()" class="auth-buttons">
+        <div class="auth-buttons-desktop">
+          <button class="btn btn-outline-primary me-2" (click)="navigateToLogin()">
+            <i class="fas fa-sign-in-alt me-1"></i>
+            Đăng nhập
+          </button>
+          <button class="btn btn-primary" (click)="navigateToSignup()">
+            <i class="fas fa-user-plus me-1"></i>
+            Đăng ký
+          </button>
+        </div>
+        
+        <div class="auth-buttons-mobile">
+          <button class="btn btn-primary" (click)="navigateToLogin()">
+            <i class="fas fa-sign-in-alt me-1"></i>
+            Đăng nhập
+          </button>
+        </div>
+      </div>
     </div>
     
     <div class="header">
@@ -21,13 +44,18 @@
       <span *ngIf="sessionService.isInstructor()">Khóa học của tôi</span>
       <span *ngIf="sessionService.isStudent()">Khóa học</span>
       <span *ngIf="sessionService.isAdmin()">Tổng quan khóa học</span>
-      <span *ngIf="!userRole">Danh sách khóa học</span>
+      <span *ngIf="!isLoggedIn()">Khóa học trực tuyến</span>
+      <span *ngIf="isLoggedIn() && !userRole">Danh sách khóa học</span>
     </h1>
-    <p class="subtitle" *ngIf="userName">
-      Xin chào, {{ userName }}
-      <span *ngIf="sessionService.isInstructor()">(Giảng viên)</span>
-      <span *ngIf="sessionService.isStudent()">(Sinh viên)</span>
-      <span *ngIf="sessionService.isAdmin()">(Quản trị viên)</span>
+    <p class="subtitle">
+      <span *ngIf="isLoggedIn() && userName">
+        <span *ngIf="sessionService.isInstructor()">(Giảng viên)</span>
+        <span *ngIf="sessionService.isStudent()">(Sinh viên)</span>
+        <span *ngIf="sessionService.isAdmin()">(Quản trị viên)</span>
+      </span>
+      <span *ngIf="!isLoggedIn()">
+        Khám phá và đăng ký các khóa học chất lượng cao
+      </span>
     </p>
   </div>
 
@@ -38,10 +66,10 @@
   </div>
 
   <!-- Layout for Students: Two sections -->
-  <div *ngIf="!loading && sessionService.isStudent()" class="student-courses-layout">
+  <div *ngIf="!loading && (sessionService.isStudent() || !isLoggedIn())" class="student-courses-layout">
     
-    <!-- Section 1: My Courses (Enrolled) -->
-    <div class="section">
+    <!-- Section 1: My Courses (Enrolled) - chỉ hiển thị khi đã đăng nhập -->
+    <div *ngIf="isLoggedIn() && sessionService.isStudent()" class="section">
       <div class="section-header">
         <h2 class="section-title">📚 Khóa học của tôi</h2>
         <span class="course-count">({{ enrolledCourses.length }} khóa học)</span>
@@ -115,25 +143,30 @@
       </div>
     </div>
 
-    <!-- Section 2: Available Courses (Not Enrolled) -->
+    <!-- Section 2: Available Courses (Not Enrolled hoặc tất cả khóa học cho guest) -->
     <div class="section">
       <div class="section-header">
-        <h2 class="section-title">🌟 Khóa học có sẵn</h2>
+        <h2 class="section-title">
+          <span *ngIf="isLoggedIn() && sessionService.isStudent()">🌟 Khóa học có sẵn</span>
+          <span *ngIf="!isLoggedIn()">🌟 Tất cả khóa học</span>
+        </h2>
         <span class="course-count">({{ availableCourses.length }} khóa học)</span>
       </div>
 
       <div *ngIf="availableCourses.length === 0" class="empty-state">
         <div class="empty-icon">📖</div>
-        <h3>Không có khóa học nào khác</h3>
-        <p>Hiện tại không có khóa học nào khác để đăng ký!</p>
+        <h3 *ngIf="isLoggedIn()">Không có khóa học nào khác</h3>
+        <h3 *ngIf="!isLoggedIn()">Hiện chưa có khóa học nào</h3>
+        <p *ngIf="isLoggedIn()">Hiện tại không có khóa học nào khác để đăng ký!</p>
+        <p *ngIf="!isLoggedIn()">Vui lòng quay lại sau để xem các khóa học mới!</p>
       </div>
 
       <div *ngIf="availableCourses.length > 0" class="courses-grid">
-        <div *ngFor="let course of availableCourses" 
+        <div *ngFor="let course of paginatedAvailableCourses" 
              class="course-card not-enrolled clickable" 
              (click)="enterCourse(course)"
              [style.cursor]="'pointer'"
-             [title]="getCoursePrice(course) > 0 ? 'Bấm để thanh toán và đăng ký khóa học: ' + getCourseTitle(course) : 'Bấm để đăng ký khóa học miễn phí: ' + getCourseTitle(course)">
+             [title]="!isLoggedIn() ? 'Mua ngay khóa học: ' + getCourseTitle(course) : (getCoursePrice(course) > 0 ? 'Bấm để mua ngay khóa học: ' + getCourseTitle(course) : 'Bấm để mua ngay khóa học miễn phí: ' + getCourseTitle(course))">
           <div class="course-header">
             <div class="course-thumbnail" *ngIf="course.thumbnailUrl">
               <img [src]="getImageUrl(course.thumbnailUrl)" 
@@ -205,16 +238,20 @@
                 
                 <button 
                   class="btn" 
-                  [ngClass]="getCoursePrice(course) > 0 ? 'btn-payment' : 'btn-free'"
+                  [ngClass]="!isLoggedIn() ? 'btn-login-required' : (getCoursePrice(course) > 0 ? 'btn-payment' : 'btn-free')"
                   (click)="$event.stopPropagation(); enterCourse(course)"
                 >
-                  <span *ngIf="getCoursePrice(course) > 0">
-                    <i class="fas fa-credit-card me-2"></i>
-                    Thanh toán & Đăng ký
+                  <span *ngIf="!isLoggedIn()">
+                    <i class="fas fa-shopping-cart me-2"></i>
+                    Mua ngay
                   </span>
-                  <span *ngIf="getCoursePrice(course) === 0">
+                  <span *ngIf="isLoggedIn() && getCoursePrice(course) > 0">
+                    <i class="fas fa-credit-card me-2"></i>
+                    Mua ngay
+                  </span>
+                  <span *ngIf="isLoggedIn() && getCoursePrice(course) === 0">
                     <i class="fas fa-plus me-2"></i>
-                    Đăng ký miễn phí
+                    Mua ngay
                   </span>
                 </button>
               </div>
@@ -222,11 +259,50 @@
           </div>
         </div>
       </div>
+
+      <!-- Pagination -->
+      <div *ngIf="availableCourses.length > itemsPerPage" class="pagination-container">
+        <nav aria-label="Phân trang khóa học">
+          <ul class="pagination">
+            <!-- Previous Button -->
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <button class="page-link" (click)="previousPage()" [disabled]="currentPage === 1">
+                <i class="fas fa-chevron-left"></i>
+                <span class="d-none d-sm-inline" style="margin-left: 5px;">Trước</span>
+              </button>
+            </li>
+
+            <!-- Page Numbers -->
+            <li *ngFor="let page of getPageNumbers()" 
+                class="page-item" 
+                [class.active]="page === currentPage">
+              <button class="page-link" (click)="goToPage(page)">
+                {{ page }}
+              </button>
+            </li>
+
+            <!-- Next Button -->
+            <li class="page-item" [class.disabled]="currentPage === totalPages">
+              <button class="page-link" (click)="nextPage()" [disabled]="currentPage === totalPages">
+                <span class="d-none d-sm-inline" style="margin-right: 5px;">Sau</span>
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </li>
+          </ul>
+        </nav>
+
+        <!-- Page Info -->
+        <div class="pagination-info">
+          <span>
+            Trang {{ currentPage }} / {{ totalPages }}
+          </span>
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- Layout for other roles (existing) -->
-  <div *ngIf="!loading && !sessionService.isStudent()">
+  <div *ngIf="!loading && !sessionService.isStudent() && isLoggedIn()">
     <!-- Empty state -->
     <div *ngIf="courses.length === 0 && userRole" class="empty-state">
       <div class="empty-icon">📚</div>
@@ -306,9 +382,46 @@
   [courseId]="selectedCourseForReviews?.courseId"
   [courseName]="selectedCourseForReviews?.courseName"
   [canWriteReview]="selectedCourseForReviews?.canWriteReview || false"
+  [courseInfo]="selectedCourseForReviews?.courseInfo"
+  [userLoggedIn]="selectedCourseForReviews?.userLoggedIn || false"
+  [isEnrolled]="selectedCourseForReviews?.isEnrolled || false"
   [isVisible]="isReviewsModalVisible"
   (closeModal)="closeReviewsModal()"
+  (enrollCourse)="onEnrollFromModal($event)"
 ></app-course-reviews-modal>
+
+<!-- Login Confirmation Modal -->
+<div *ngIf="showLoginConfirmModal" class="modal-overlay" (click)="closeLoginConfirmModal()">
+  <div class="confirmation-modal" (click)="$event.stopPropagation()">
+    <div class="confirmation-header">
+      <h4>
+        <i class="fas fa-user-circle me-2"></i>
+        Bạn có tài khoản chưa?
+      </h4>
+      <button type="button" class="btn-close-confirm" (click)="closeLoginConfirmModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="confirmation-body">
+      <p class="text-center mb-4">
+        Để mua khóa học này, bạn cần có tài khoản. Hãy chọn một trong hai tùy chọn bên dưới:
+      </p>
+      
+      <div class="confirmation-buttons">
+        <button class="btn btn-primary btn-block" (click)="goToLogin()">
+          <i class="fas fa-sign-in-alt me-2"></i>
+          Tôi đã có tài khoản - Đăng nhập
+        </button>
+        
+        <button class="btn btn-success btn-block" (click)="goToRegister()">
+          <i class="fas fa-user-plus me-2"></i>
+          Tôi chưa có tài khoản - Đăng ký
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Notification Component -->
 <app-notification></app-notification>

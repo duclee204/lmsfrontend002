@@ -91,11 +91,13 @@
     right: 0;
     background-color: white;
     border: 1px solid #ccc;
-    border-radius: 4px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
     min-width: 160px;
     display: none;
-    z-index: 1000; /* Increased z-index for mobile */
+    z-index: 10500; /* Very high z-index to ensure it appears above all other elements */
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.95);
 }
 
 .profile-dropdown .dropdown-item {

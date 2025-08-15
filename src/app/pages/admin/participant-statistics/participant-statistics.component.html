@@ -289,20 +289,6 @@
 
       <!-- Action Buttons -->
       <div class="action-buttons">
-        <button class="btn btn-primary" (click)="refreshData()" [disabled]="loading">
-          <i class="fas fa-refresh"></i>
-          Làm mới dữ liệu
-        </button>
-        
-        <button class="btn btn-secondary" (click)="debugAPIData()">
-          <i class="fas fa-bug"></i>
-          Debug Data
-        </button>
-        
-        <button class="btn btn-secondary" (click)="exportStatistics()">
-          <i class="fas fa-download"></i>
-          Xuất JSON
-        </button>
 
         <!-- Sửa lỗi: Đảm bảo hàm exportParticipantStatisticsToPDF được gọi đúng context và là public method -->
        <button class="btn btn-pdf" (click)="exportToPDF()">
@@ -310,7 +296,6 @@
           Xuất PDF
         </button>
       </div>
-
       <!-- Charts Section -->
       <div class="charts-section">
         <!-- Monthly Enrollments Chart -->

@@ -1,21 +1,49 @@
 <!-- learn-online.component.html -->
 <app-notification></app-notification>
-<div class="learn-online-layout" [class.no-right-sidebar]="!shouldShowVideoList()">
-  <aside class="sidebar" role="complementary" aria-label="Sidebar navigation">
-    <!-- Sidebar content (unchanged) -->
-    <app-sidebar></app-sidebar>
+<div class="learn-online-layout">
+  <!-- Left sidebar for video list -->
+  <aside class="video-sidebar" *ngIf="shouldShowVideoList()" role="complementary" aria-label="Course lessons">
+    <!-- Back to Home Button -->
+    <div class="back-to-home-container">
+      <button class="back-to-home-btn" (click)="goBackToHome()">
+        <i class="fas fa-home"></i>
+        <span>Trang chủ</span>
+      </button>
+    </div>
+
+    <h3>Danh sách bài học</h3>
+
+    <!-- Loading state for lessons -->
+    <div *ngIf="loading" class="lessons-loading">
+      <i class="fas fa-spinner fa-spin"></i>
+      <p>Đang tải bài học...</p>
+    </div>
+
+    <!-- No lessons message -->
+    <div *ngIf="hasNoVideos && !loading" class="no-lessons-message">
+      <i class="fas fa-book-open"></i>
+      <p>Chưa có bài học nào</p>
+    </div>
+
+    <!-- Lessons list -->
+    <nav *ngIf="!hasNoVideos && !loading" class="recorded-videos">
+      <a *ngFor="let video of videos; let i = index" href="#" (click)="playVideo(video, $event)" [class.active]="video === currentVideo">
+        <div>
+          <i class="far fa-play-circle"></i>
+          <span class="lesson-number">Bài {{ i + 1 }}:</span>
+          <span class="lesson-title">{{ video.title }}</span>
+        </div>
+      </a>
+    </nav>
   </aside>
 
   <main class="content" role="main">
-    <!-- Profile component -->
-    <div class="profile-header">
-      <app-profile
-        [username]="username"
-        [role]="getDisplayRole(userRole)"
-        [avatarUrl]="avatarUrl"
-        (profileUpdate)="onProfileUpdate()"
-        (logout)="onLogout()">
-      </app-profile>
+    <!-- Back to Home Button cho trường hợp không có sidebar -->
+    <div *ngIf="!shouldShowVideoList()" class="back-to-home-top">
+      <button class="back-to-home-btn" (click)="goBackToHome()">
+        <i class="fas fa-home"></i>
+        <span>Trang chủ</span>
+      </button>
     </div>
 
     <!-- Course title - hiển thị tên khóa học thay vì "Classroom" -->
@@ -41,32 +69,4 @@
       </div>
     </div>
   </main>
-
-  <aside class="right-sidebar" *ngIf="shouldShowVideoList()" role="complementary" aria-label="Course lessons">
-    <h3>Danh sách bài học</h3>
-
-    <!-- Loading state for lessons -->
-    <div *ngIf="loading" class="lessons-loading">
-      <i class="fas fa-spinner fa-spin"></i>
-      <p>Đang tải bài học...</p>
-    </div>
-
-    <!-- No lessons message -->
-    <div *ngIf="hasNoVideos && !loading" class="no-lessons-message">
-      <i class="fas fa-book-open"></i>
-      <p>Chưa có bài học nào</p>
-    </div>
-
-    <!-- Lessons list -->
-    <nav *ngIf="!hasNoVideos && !loading" class="recorded-videos">
-      <a *ngFor="let video of videos; let i = index" href="#" (click)="playVideo(video, $event)" [class.active]="video === currentVideo">
-        <div>
-          <i class="far fa-play-circle"></i>
-          <span class="lesson-number">Bài {{ i + 1 }}:</span>
-          <span class="lesson-title">{{ video.title }}</span>
-        </div>
-        <span class="lesson-duration">{{ video.duration || '00:00' }}</span>
-      </a>
-    </nav>
-  </aside>
 </div>

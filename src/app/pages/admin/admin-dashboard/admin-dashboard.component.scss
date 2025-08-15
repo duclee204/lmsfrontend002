@@ -88,8 +88,10 @@
 .admin-stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 25px;
+  gap: 60px 40px; /* row-gap: 60px, column-gap: 40px */
+  row-gap: 80px; /* Đặc biệt tăng khoảng cách theo chiều dọc */
   margin-bottom: 40px;
+  padding: 20px; /* Thêm padding để tạo khoảng cách với container */
 }
 
 .admin-stat-card {
@@ -103,6 +105,7 @@
   transition: all 0.3s ease;
   border: 1px solid rgba(255, 255, 255, 0.2);
   cursor: pointer;
+  margin: 15px 15px 30px 15px; /* Tăng margin-bottom để có thêm khoảng cách dọc */
   
   &:hover {
     transform: translateY(-5px);
@@ -291,11 +294,14 @@
 @media (max-width: 768px) {
   .admin-stats {
     grid-template-columns: 1fr;
-    gap: 20px;
+    gap: 50px 20px; /* row-gap: 50px, column-gap: 20px */
+    row-gap: 60px; /* Tăng khoảng cách dọc cho tablet */
+    padding: 15px; /* Giảm padding trên mobile */
   }
   
   .admin-stat-card {
     padding: 20px;
+    margin: 10px 10px 25px 10px; /* Tăng margin-bottom cho tablet */
     
     .stat-icon {
       width: 60px;
@@ -374,13 +380,16 @@
   }
   
   .admin-stats {
-    gap: 15px;
+    gap: 40px 15px; /* row-gap: 40px, column-gap: 15px */
+    row-gap: 50px; /* Tăng khoảng cách dọc cho mobile nhỏ */
+    padding: 10px; /* Giảm padding cho mobile nhỏ */
   }
   
   .admin-stat-card {
     padding: 15px;
     flex-direction: column;
     text-align: center;
+    margin: 5px 5px 20px 5px; /* Tăng margin-bottom cho mobile nhỏ */
     
     .stat-icon {
       margin-right: 0;

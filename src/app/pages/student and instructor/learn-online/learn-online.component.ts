@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../../../services/api.service';
 import { SessionService } from '../../../services/session.service';
 import { NotificationService } from '../../../services/notification.service';
@@ -15,7 +15,7 @@ import { ModuleContentService } from '../../../services/module-content.service';
 @Component({
   selector: 'app-learn-online',
   standalone: true,
-  imports: [CommonModule, FormsModule, SidebarComponent, ProfileComponent, NotificationComponent],
+  imports: [CommonModule, FormsModule, NotificationComponent],
   templateUrl: './learn-online.component.html',
   styleUrls: ['./learn-online.component.scss']
 })
@@ -44,6 +44,7 @@ export class LearnOnlineComponent implements OnInit, OnDestroy {
     private http: HttpClient,
     private apiService: ApiService,
     private route: ActivatedRoute,
+    private router: Router,
     private sessionService: SessionService,
     private userService: UserService,
     private notificationService: NotificationService,
@@ -375,6 +376,15 @@ export class LearnOnlineComponent implements OnInit, OnDestroy {
     });
   }
 
+  // Navigate back to home page
+  goBackToHome() {
+    if (this.sessionService.isStudent()) {
+      this.router.navigate(['/courses']); // Navigate to courses page for students
+    } else {
+      this.router.navigate(['/dashboard']); // Navigate to dashboard for instructors/admins
+    }
+  }
+
   private addVideoSeekLimitation() {
     if (!isPlatformBrowser(this.platformId)) return;
 
@@ -386,6 +396,39 @@ export class LearnOnlineComponent implements OnInit, OnDestroy {
     let lastTime = 0;
     let isUserSeeking = false;
 
+    // Disable seeking for students completely
+    if (this.sessionService.isStudent()) {
+      // Prevent seeking for students
+      video.addEventListener('seeking', (e) => {
+        e.preventDefault();
+        video.currentTime = lastTime; // Reset to previous position
+        this.showAlert('Sinh viên không được phép tua video!', 'warning');
+      });
+
+      // Disable context menu to prevent right-click seek
+      video.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+      });
+
+      // Disable keyboard shortcuts for seeking
+      video.addEventListener('keydown', (e) => {
+        // Disable arrow keys, space, page up/down for seeking
+        if (['ArrowLeft', 'ArrowRight', 'PageUp', 'PageDown', 'Home', 'End'].includes(e.code)) {
+          e.preventDefault();
+        }
+      });
+
+      // Track time normally without allowing seeks
+      video.addEventListener('timeupdate', () => {
+        if (!isUserSeeking) {
+          lastTime = video.currentTime;
+        }
+      });
+
+      return; // Exit early for students - no seeking allowed
+    }
+
+    // Original seeking limitation logic for instructors/admins
     // Theo dõi thời gian phát để phát hiện tua
     video.addEventListener('timeupdate', () => {
       if (!isUserSeeking) {

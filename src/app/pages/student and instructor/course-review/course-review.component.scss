@@ -1,7 +1,7 @@
 .courses-layout {
   display: flex;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #E5ECFF;
   position: relative;
   
   &::before {
@@ -651,15 +651,31 @@
     display: flex;
     gap: 15px;
     align-items: center;
+    justify-content: flex-end; // Đưa các nút về phía phải
     
     .badge.reviewed {
       background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
       color: white;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 0.85rem;
+      padding: 10px 15px;
+      border-radius: 12px;
+      font-size: 1rem;
       font-weight: 600;
       box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+      min-width: 120px;
+      text-align: center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: auto; // Đẩy nút về sát phải
+      transition: all 0.3s ease;
+      cursor: default;
+      border: none;
+      text-decoration: none;
+      
+      i {
+        margin-right: 8px;
+        font-size: 1.1rem;
+      }
     }
   }
 }

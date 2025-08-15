@@ -130,12 +130,16 @@
   color: #e74c3c;
 }
 
-/* Payment Methods */
+/* Payment Methods - Enhanced Styling */
 .payment-methods {
+  margin-bottom: 1.5rem;
+  
   .form-label {
     font-weight: 600;
-    margin-bottom: 12px;
+    margin-bottom: 1rem;
     display: block;
+    color: #495057;
+    font-size: 1rem;
   }
 }
 
@@ -148,192 +152,426 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px;
+  padding: 1rem 1.25rem;
   border: 2px solid #e9ecef;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
 
   &:hover {
     border-color: #667eea;
-    background-color: #f8f9fa;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.15);
+    
+    &::before {
+      opacity: 1;
+    }
   }
 
   &.selected {
     border-color: #667eea;
-    background-color: #e7f1ff;
-    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+    background: linear-gradient(135deg, #e7f1ff 0%, #f0f7ff 100%);
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.25);
+    transform: translateY(-1px);
+    
+    &::before {
+      opacity: 1;
+    }
+    
+    .payment-option-content {
+      i {
+        color: #667eea;
+        transform: scale(1.1);
+      }
+      
+      span {
+        color: #495057;
+        font-weight: 600;
+      }
+    }
   }
 }
 
 .payment-option-content {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 15px;
+  position: relative;
+  z-index: 1;
 
   i {
     font-size: 1.5rem;
-    color: #667eea;
-    width: 24px;
+    color: #6c757d;
+    width: 28px;
     text-align: center;
+    transition: all 0.3s ease;
   }
 
   span {
     font-weight: 500;
+    color: #495057;
+    font-size: 1rem;
+    transition: all 0.3s ease;
   }
 }
 
 .payment-option-radio {
+  position: relative;
+  z-index: 1;
+  
   input[type="radio"] {
     width: 20px;
     height: 20px;
     accent-color: #667eea;
+    cursor: pointer;
+    transform: scale(1.1);
+    transition: transform 0.2s ease;
+    
+    &:checked {
+      transform: scale(1.2);
+    }
   }
 }
 
-/* Payment Summary */
+/* Payment Summary - Enhanced */
 .payment-summary {
-  background: #f8f9fa;
-  border-radius: 8px;
-  padding: 20px;
-  border: 1px solid #e9ecef;
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 2px solid #e9ecef;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
 }
 
 .summary-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(233, 236, 239, 0.5);
+  transition: all 0.3s ease;
 
   &:last-child {
     margin-bottom: 0;
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: rgba(102, 126, 234, 0.05);
+    margin: 0 -0.5rem 0.75rem -0.5rem;
+    padding: 0.5rem;
+    border-radius: 6px;
   }
 
   &.total {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     color: #212529;
+    font-weight: 700;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    margin: 0.75rem -0.75rem 0 -0.75rem;
+    padding: 1rem 0.75rem;
+    border-radius: 8px;
+    border: 2px solid rgba(102, 126, 234, 0.2);
+    
+    span {
+      color: #667eea;
+    }
+  }
+  
+  span:first-child {
+    color: #6c757d;
+    font-weight: 500;
+  }
+  
+  span:last-child {
+    color: #28a745;
+    font-weight: 600;
+    font-size: 1.05rem;
   }
 }
 
-/* Buttons */
+/* Enhanced Buttons */
 .btn {
-  padding: 12px 24px;
-  border-radius: 6px;
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
   border: none;
-  font-weight: 500;
+  font-weight: 600;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover::before {
+    opacity: 1;
+  }
 
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
   }
 
   &.btn-primary {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 
     &:hover:not(:disabled) {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+      background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    }
+    
+    &:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.5);
     }
   }
 
   &.btn-secondary {
-    background: #6c757d;
+    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
     color: white;
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
 
     &:hover:not(:disabled) {
-      background: #5a6268;
+      background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(108, 117, 125, 0.4);
     }
+  }
+  
+  .spinner-border {
+    width: 1rem;
+    height: 1rem;
+    border-width: 0.15rem;
+  }
+  
+  i {
+    font-size: 1rem;
   }
 }
 
-/* Alert */
+/* Enhanced Alert */
 .alert {
-  padding: 12px 16px;
-  border-radius: 6px;
-  margin-bottom: 16px;
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
   display: flex;
   align-items: center;
+  position: relative;
+  overflow: hidden;
+  border: none;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+  }
 
   &.alert-danger {
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
     color: #721c24;
+    
+    &::before {
+      background: #dc3545;
+    }
+    
+    i {
+      color: #dc3545;
+      margin-right: 0.75rem;
+      font-size: 1.1rem;
+    }
+  }
+  
+  &.alert-info {
+    background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+    color: #0c5460;
+    
+    &::before {
+      background: #17a2b8;
+    }
+    
+    i {
+      color: #17a2b8;
+      margin-right: 0.75rem;
+      font-size: 1.1rem;
+    }
+  }
+  
+  &.alert-success {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+    
+    &::before {
+      background: #28a745;
+    }
+    
+    i {
+      color: #28a745;
+      margin-right: 0.75rem;
+      font-size: 1.1rem;
+    }
   }
 }
 
 /* VNPay Form Styles */
 .vnpay-form {
   .card {
-    border-radius: 8px;
+    border-radius: 12px;
     overflow: hidden;
+    border: 2px solid #667eea;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.15);
   }
 
   .card-header {
-    border-radius: 8px 8px 0 0 !important;
+    border-radius: 12px 12px 0 0 !important;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    border-bottom: none;
+    padding: 1rem 1.5rem;
   }
 
-  .test-cards {
-    .test-card {
-      background-color: #f8f9fa;
-      border: 1px solid #dee2e6;
-      border-radius: 6px;
-      padding: 12px;
-      margin-bottom: 10px;
-      transition: all 0.2s ease;
-
-      &:hover {
-        background-color: #e9ecef;
-        border-color: #adb5bd;
-      }
-
-      strong {
-        color: #495057;
-        font-size: 0.9rem;
-      }
-
-      code {
-        background-color: #fff;
-        color: #dc3545;
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-size: 0.85rem;
-        font-weight: 600;
-      }
-
-      small {
-        color: #6c757d;
-        font-size: 0.8rem;
-      }
-    }
+  .card-body {
+    padding: 1.5rem;
   }
 
+  // Enhanced Input Groups
   .payment-amount {
+    margin-bottom: 1.5rem;
+    
+    .form-label {
+      font-weight: 600;
+      color: #495057;
+      margin-bottom: 0.75rem;
+      font-size: 0.95rem;
+    }
+    
     .input-group {
-      .form-control {
-        font-weight: 600;
-        font-size: 1.1rem;
-        color: #28a745;
-        background-color: #f8f9fa;
-      }
-
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      
       .input-group-text {
-        background-color: #e9ecef;
-        border-color: #ced4da;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        font-weight: 600;
+        border-radius: 0;
+        
+        &:first-child {
+          border-radius: 8px 0 0 8px;
+        }
+        
+        &:last-child {
+          border-radius: 0 8px 8px 0;
+        }
+        
+        i {
+          font-size: 1rem;
+        }
+      }
+      
+      .form-control {
+        font-weight: 700;
+        font-size: 1.2rem;
+        color: #28a745;
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        border: none;
+        text-align: center;
+        padding: 0.75rem 1rem;
+        
+        &:focus {
+          box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+          background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        }
+        
+        &:readonly {
+          background: linear-gradient(135deg, #e9ecef 0%, #f8f9fa 100%);
+          cursor: not-allowed;
+        }
       }
     }
   }
 
-  .alert-info {
-    border-left: 4px solid #17a2b8;
-    background-color: #d1ecf1;
-    border-color: #bee5eb;
+  // Enhanced Order Info Input
+  .mt-3 {
+    .form-label {
+      font-weight: 600;
+      color: #495057;
+      margin-bottom: 0.75rem;
+      font-size: 0.95rem;
+    }
+    
+    .form-control {
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-weight: 500;
+      color: #495057;
+      background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+      transition: all 0.3s ease;
+      
+      &:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+      }
+      
+      &:readonly {
+        background: linear-gradient(135deg, #e9ecef 0%, #f8f9fa 100%);
+        color: #6c757d;
+        cursor: not-allowed;
+      }
+    }
   }
 }
 

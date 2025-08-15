@@ -1,4 +1,4 @@
-<<div class="courses-layout">
+<div class="courses-layout">
   <!-- Notification Component -->
   <app-notification></app-notification>
 
@@ -157,56 +157,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Show reviews for selected course -->
-      <div *ngIf="!showAllCourses && selectedCourse" class="selected-course-reviews">
-        <div class="course-header card">
-          <img [src]="getImageUrl(selectedCourse.courseImage)" alt="Course Image" class="course-image">
-          <div class="course-header-content">
-            <h2>{{ selectedCourse.courseTitle }}</h2>
-            <p>{{ selectedCourse.description }}</p>
-            <button class="btn btn-secondary" (click)="backToAllCourses()">
-              <i class="fas fa-arrow-left"></i> Quay lại danh sách khóa học
-            </button>
-          </div>
-        </div>
-
-        <!-- Course Reviews -->
-        <div class="course-reviews-section">
-          <h3>Đánh giá khóa học ({{ courseReviews.length }})</h3>
-          
-          <div class="reviews-list" *ngIf="courseReviews.length > 0">
-            <div class="review-item card" *ngFor="let review of courseReviews">
-              <div class="review-header">
-                <img [src]="getAvatarUrl(review.avatarUrl)" alt="Avatar" class="reviewer-avatar">
-                <div class="reviewer-info">
-                  <strong>{{ review.fullName }}</strong>
-                  <span class="review-date">{{ review.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
-                </div>
-                <button class="btn btn-danger btn-sm" (click)="deleteReview(review.reviewId!)">
-                  <i class="fas fa-trash"></i> Xóa
-                </button>
-              </div>
-              <div class="rating">
-                <i class="fa fa-star" 
-                   *ngFor="let star of getStarArray(review.rating)" 
-                   [class.filled]="isStarFilled(star, review.rating)">
-                </i>
-                <span>{{ review.rating }}.0</span>
-              </div>
-              <p class="review-comment" *ngIf="review.comment">{{ review.comment }}</p>
-            </div>
-          </div>
-
-          <div *ngIf="courseReviews.length === 0" class="no-reviews card">
-            <div class="empty-state">
-              <i class="fas fa-star"></i>
-              <h3>Chưa có đánh giá nào</h3>
-              <p>Khóa học này chưa có đánh giá từ học viên.</p>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- Instructor View: Reviews -->
@@ -238,62 +188,6 @@
 
       <div *ngIf="courseReviews.length === 0" class="no-reviews card">
         <p>Chưa có đánh giá nào cho các khóa học của bạn.</p>
-      </div>
-    </div>
-
-    <!-- Selected Course Reviews (for Students) -->
-    <div *ngIf="selectedCourse && sessionService.isStudent()" class="selected-course-reviews">
-      <div class="course-header card">
-        <img [src]="getImageUrl(selectedCourse.courseImage)" alt="Course Image" class="course-image">
-        <div>
-          <h2>{{ selectedCourse.courseTitle }}</h2>
-          <button class="btn btn-secondary" (click)="selectedCourse = null">← Quay lại</button>
-        </div>
-      </div>
-
-      <!-- My Review -->
-      <div *ngIf="myReview" class="my-review card">
-        <h3>Đánh giá của bạn</h3>
-        <div class="review-content">
-          <div class="rating">
-            <i class="fa fa-star" 
-               *ngFor="let star of getStarArray(myReview.rating)" 
-               [class.filled]="isStarFilled(star, myReview.rating)">
-            </i>
-            <span>{{ myReview.rating }}.0</span>
-          </div>
-          <p *ngIf="myReview.comment">{{ myReview.comment }}</p>
-          <button class="btn btn-primary" (click)="openReviewForm(selectedCourse)">
-            <i class="fa fa-pencil"></i> Chỉnh sửa đánh giá
-          </button>
-        </div>
-      </div>
-
-      <!-- All Reviews -->
-      <div class="all-reviews">
-        <h3>Tất cả đánh giá ({{ courseReviews.length }})</h3>
-        <div class="reviews-list" *ngIf="courseReviews.length > 0">
-          <div class="review-item card" *ngFor="let review of courseReviews">
-            <div class="review-header">
-              <img [src]="getAvatarUrl(review.avatarUrl)" alt="Avatar" class="reviewer-avatar">
-              <div class="reviewer-info">
-                <strong>{{ review.fullName }}</strong>
-                <span class="review-date">{{ review.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
-              </div>
-            </div>
-            <div class="rating">
-              <i class="fa fa-star" 
-                 *ngFor="let star of getStarArray(review.rating)" 
-                 [class.filled]="isStarFilled(star, review.rating)">
-              </i>
-              <span>{{ review.rating }}.0</span>
-            </div>
-            <p class="review-comment" *ngIf="review.comment">{{ review.comment }}</p>
-          </div>
-        </div>
-        <div *ngIf="courseReviews.length === 0" class="no-reviews">
-          <p>Chưa có đánh giá nào cho khóa học này.</p>
-        </div>
       </div>
     </div>
 
@@ -334,4 +228,15 @@
       </div>
     </div>
   </div>
-</div>
+<!-- Course Reviews Modal -->
+<app-course-reviews-modal
+  [courseId]="selectedCourseForReviews?.courseId"
+  [courseName]="selectedCourseForReviews?.courseName"
+  [canWriteReview]="selectedCourseForReviews?.canWriteReview || false"
+  [courseInfo]="selectedCourseForReviews?.courseInfo"
+  [userLoggedIn]="selectedCourseForReviews?.userLoggedIn || false"
+  [isEnrolled]="selectedCourseForReviews?.isEnrolled || false"
+  [isVisible]="isReviewsModalVisible"
+  (closeModal)="closeReviewsModal()"
+  (enrollCourse)="onEnrollFromModal($event)"
+></app-course-reviews-modal>

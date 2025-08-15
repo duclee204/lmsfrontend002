@@ -4,17 +4,20 @@ import { FormsModule } from '@angular/forms';
 import { CourseReview, CourseReviewService, ReviewRequest, CourseCompletionDTO } from '../../../services/course-review.service';
 import { SessionService } from '../../../services/session.service';
 import { ImageUrlService } from '../../../services/image-url.service';
+import { CourseService } from '../../../services/course.service';
+import { CategoryService } from '../../../services/category.service';
+import { UserService } from '../../../services/user.service';
 import { SidebarWrapperComponent } from '../../../components/sidebar-wrapper/sidebar-wrapper.component';
 import { ProfileComponent } from '../../../components/profile/profile.component';
 import { NotificationComponent } from '../../../components/notification/notification.component';
-import { UserService } from '../../../services/user.service';
+import { CourseReviewsModalComponent } from '../../../components/course-reviews-modal/course-reviews-modal.component';
 import { ApiService } from '../../../services/api.service';
 import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-course-review',
   standalone: true,
-  imports: [CommonModule, FormsModule, SidebarWrapperComponent, ProfileComponent, NotificationComponent],
+  imports: [CommonModule, FormsModule, SidebarWrapperComponent, ProfileComponent, NotificationComponent, CourseReviewsModalComponent],
   templateUrl: './course-review.component.html',
   styleUrls: ['./course-review.component.scss']
 })
@@ -52,6 +55,10 @@ export class CourseReviewComponent implements OnInit {
   loading: boolean = false;
   showAllCourses: boolean = true; // Mặc định hiển thị tất cả khóa học cho admin
   
+  // Course Reviews Modal states
+  isReviewsModalVisible: boolean = false;
+  selectedCourseForReviews: any = null;
+  
   // Minimum completion percentage required for review
   readonly MIN_COMPLETION_PERCENTAGE = 80;
 
@@ -60,6 +67,8 @@ export class CourseReviewComponent implements OnInit {
     public sessionService: SessionService,
     private userService: UserService,
     private imageUrlService: ImageUrlService,
+    private courseService: CourseService,
+    private categoryService: CategoryService,
     private apiService: ApiService
   ) {}
 
@@ -266,9 +275,8 @@ export class CourseReviewComponent implements OnInit {
   }
 
   selectCourse(course: CourseReview): void {
-    this.selectedCourse = course;
-    this.loadCourseReviews(course.courseId);
-    this.loadMyReview(course.courseId);
+    // Open reviews modal instead of setting selectedCourse
+    this.openCourseReviewsModal(course);
   }
 
   loadCourseReviews(courseId: number): void {
@@ -409,5 +417,81 @@ export class CourseReviewComponent implements OnInit {
     }
     
     return this.imageUrlService.getAvatarUrl(avatarUrl);
+  }
+
+  // Course Reviews Modal Methods
+  openCourseReviewsModal(course: CourseReview): void {
+    // Lấy thông tin chi tiết khóa học từ backend
+    this.courseService.getCourseById(course.courseId).subscribe({
+      next: (courseDetail) => {
+        // Tạo các observable để lấy thêm thông tin
+        const requests: any = {
+          course: courseDetail
+        };
+
+        // Lấy thông tin category nếu có categoryId
+        if (courseDetail.categoryId) {
+          this.categoryService.getCategories().subscribe({
+            next: (categories) => {
+              const category = categories.find(c => (c as any).categoryId === courseDetail.categoryId || c.id === courseDetail.categoryId);
+              const categoryName = category ? category.name : '';
+              
+              // Lấy thông tin instructor nếu có instructorId
+              if (courseDetail.instructorId) {
+                this.userService.getUserById(courseDetail.instructorId).subscribe({
+                  next: (instructor) => {
+                    this.setModalData(course, courseDetail, categoryName, instructor.fullName || instructor.username || '');
+                  },
+                  error: () => {
+                    this.setModalData(course, courseDetail, categoryName, '');
+                  }
+                });
+              } else {
+                this.setModalData(course, courseDetail, categoryName, '');
+              }
+            },
+            error: () => {
+              this.setModalData(course, courseDetail, '', '');
+            }
+          });
+        } else {
+          this.setModalData(course, courseDetail, '', '');
+        }
+      },
+      error: (error) => {
+        // Fallback với thông tin cơ bản nếu không lấy được chi tiết
+        console.warn('Không thể lấy thông tin chi tiết khóa học:', error);
+        this.setModalData(course, null, '', '');
+      }
+    });
+  }
+
+  private setModalData(course: CourseReview, courseDetail: any, categoryName: string, instructorName: string): void {
+    this.selectedCourseForReviews = {
+      courseId: course.courseId,
+      courseName: course.courseTitle,
+      canWriteReview: this.canReviewCourse(course),
+      courseInfo: {
+        price: courseDetail?.price || 0,
+        categoryName: categoryName,
+        instructorName: instructorName,
+        description: courseDetail?.description || course.description,
+        thumbnailUrl: courseDetail?.thumbnailUrl || course.courseImage
+      },
+      userLoggedIn: this.sessionService.getCurrentUser() !== null,
+      isEnrolled: true // Since they're eligible for review, they're enrolled
+    };
+    this.isReviewsModalVisible = true;
+  }
+
+  closeReviewsModal(): void {
+    this.isReviewsModalVisible = false;
+    this.selectedCourseForReviews = null;
+  }
+
+  onEnrollFromModal(courseId: number): void {
+    // This method is called if user tries to enroll from modal
+    // In this context, users are already enrolled, so this shouldn't be needed
+    console.log('Enroll attempt for course:', courseId);
   }
 }
